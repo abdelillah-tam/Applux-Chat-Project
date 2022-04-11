@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/purple_200">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/purple_700"
+        app:layout_constraintTop_toTopOf="parent"
+        app:elevation="0dp"
+        >
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar_of_contactfrag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleTextColor="@color/white"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:id="@+id/selectacontact"
+                android:text="Select a contact"
+                android:textColor="@color/white"
+                android:fontFamily="@font/tajawal_regular"
+                android:textSize="24sp" />
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/contact_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/purple_700"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
+
+    <ProgressBar
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:id="@+id/progress_contacts"
+        android:theme="@style/ProgressBarStyle"
+        app:layout_constraintBottom_toBottomOf="@+id/contact_list_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/contact_list_view" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_mai"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.applux.ui.MainFragment"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_chatchannelFragment"
+            app:destination="@id/chatchannelFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.example.applux.ui.contacts.ContactsFragment" >
+        <action
+            android:id="@+id/action_contactsFragment_to_chatchannelFragment"
+            app:destination="@id/chatchannelFragment" />
+        <action
+            android:id="@+id/action_contactsFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatchannelFragment"
+        android:name="com.example.applux.ui.chatchannel.ChatchannelFragment"
+        tools:layout="@layout/fragment_chatchannel" >
+        <argument
+            android:name="contact"
+            app:argType="com.example.applux.domain.models.ContactUser" />
+        <action
+            android:id="@+id/action_chatchannelFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_chatchannelFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+        <action
+            android:id="@+id/action_chatchannelFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment" />
+        <argument
+            android:name="profileBitmap"
+            app:argType="android.graphics.Bitmap" />
+    </fragment>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.applux.ui.profile.ProfileFragment"
+        tools:layout="@layout/fragment_profile" >
+        <argument
+            android:name="contactUser"
+            app:argType="com.example.applux.domain.models.ContactUser" />
+        <argument
+            android:name="about"
+            app:argType="com.example.applux.domain.models.About" />
+        <action
+            android:id="@+id/action_profileFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.applux.ui.settings.SettingsFragment"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+</navigation>

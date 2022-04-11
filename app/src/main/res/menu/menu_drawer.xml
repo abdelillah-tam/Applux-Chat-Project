@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+    <item android:title="Account"
+        >
+        <menu>
+            <item
+                android:id="@+id/nav_savedmessages_item"
+                android:title="Saved Messages"
+                android:icon="@drawable/ic_saved_messages"
+                />
+            <item
+                android:id="@+id/nav_settings_item"
+                android:title="Settings"
+                android:icon="@drawable/ic_settings"
+                />
+        </menu>
+    </item>
+
+
+    <item android:title="Extra">
+        <menu>
+            <item
+                android:id="@+id/nav_features_item"
+                android:title="Applux Features"
+                android:icon="@drawable/ic_info"
+                />
+            <item
+                android:id="@+id/nav_invitefriends_item"
+                android:title="Invite Friends"
+                android:icon="@drawable/ic_invite_friend"
+                />
+        </menu>
+    </item>
+
+</menu>
