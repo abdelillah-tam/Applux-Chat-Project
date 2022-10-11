@@ -13,13 +13,13 @@ plugins {
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 31
+    compileSdk 32
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.example.applux"
         minSdk 22
-        targetSdk 30
+        targetSdk 31
         versionCode 1
         versionName "1.0"
 
@@ -54,30 +54,30 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-beta01'
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
-    implementation('androidx.fragment:fragment-ktx:1.4.0')
-    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation('androidx.fragment:fragment-ktx:1.5.3')
+    implementation("androidx.activity:activity-ktx:1.6.0")
 
-    implementation('androidx.navigation:navigation-fragment-ktx:2.4.0-beta02')
-    implementation('androidx.navigation:navigation-ui-ktx:2.4.0-beta02')
-    implementation('androidx.navigation:navigation-dynamic-features-fragment:2.4.0-beta02')
+    implementation('androidx.navigation:navigation-fragment-ktx:2.6.0-alpha02')
+    implementation('androidx.navigation:navigation-ui-ktx:2.6.0-alpha02')
+    implementation('androidx.navigation:navigation-dynamic-features-fragment:2.6.0-alpha02')
 
-    implementation('androidx.lifecycle:lifecycle-livedata-ktx:2.4.0')
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.4.0")
-    implementation("androidx.lifecycle:lifecycle-service:2.4.0")
+    implementation('androidx.lifecycle:lifecycle-livedata-ktx:2.5.1')
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation("androidx.lifecycle:lifecycle-service:2.5.1")
 
 
     implementation platform('com.google.firebase:firebase-bom:28.3.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx:20.0.1'
-    implementation 'com.google.firebase:firebase-database-ktx:20.0.3'
+    implementation 'com.google.firebase:firebase-analytics-ktx:21.1.1'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.6'
     implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.android.gms:play-services-auth:20.0.0'
+    implementation 'com.google.android.gms:play-services-auth:20.3.0'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:8.0.0'
@@ -88,19 +88,19 @@ dependencies {
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
-    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2-native-mt')
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.2-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt'
+    implementation('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0')
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
 
     implementation 'com.google.android.gms:play-services-safetynet:18.0.0'
     implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04'
 
     implementation 'io.michaelrocks:libphonenumber-android:8.12.36'
-    implementation('androidx.paging:paging-runtime:3.1.0')
+    implementation('androidx.paging:paging-runtime:3.1.1')
 
     // Dagger Hilt
-    implementation('com.google.dagger:hilt-android:2.40.5')
-    kapt('com.google.dagger:hilt-android-compiler:2.40.5')
+    implementation('com.google.dagger:hilt-android:2.43.1')
+    kapt('com.google.dagger:hilt-android-compiler:2.43.1')
 
     implementation 'com.ramotion.navigationtoolbar:navigation-toolbar:0.1.3'
 

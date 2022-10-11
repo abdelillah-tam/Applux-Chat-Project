@@ -104,7 +104,7 @@ class MessageRepositoryImpl @Inject constructor(
                         Log.e(TAG, "getUsersYouTalkedWith: " + it.document.toObject(Message::class.java).text )
                     }*/
                     try {
-                        offer(finalContactWithLastMessage)
+                        trySend(finalContactWithLastMessage)
                         finalContactWithLastMessage = emptySet()
                     } catch (e: Throwable) {
 
@@ -127,7 +127,7 @@ class MessageRepositoryImpl @Inject constructor(
                 if (value != null){
                     val message = value.documents[0].toObject(Message::class.java)
                     try {
-                        offer(message)
+                        trySend(message)
                     }catch (e: Throwable){
 
                     }
