@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="250dp"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/purple_700">
+    android:background="@color/white">
 
-    <de.hdodenhof.circleimageview.CircleImageView
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/profileCircleNavView"
         android:layout_width="96dp"
         android:layout_height="96dp"
         android:layout_marginStart="24dp"
+        android:tint="@color/orange_100"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,11 +22,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="20sp"
         android:fontFamily="@font/tajawal_regular"
         android:id="@+id/profilenameNavView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/profileCircleNavView"
-        android:text="Abdelillah Tamoussat" />
+        tools:text="Abdelillah Tamoussat" />
 </androidx.constraintlayout.widget.ConstraintLayout>

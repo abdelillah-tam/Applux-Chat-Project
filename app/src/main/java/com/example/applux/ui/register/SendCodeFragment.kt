@@ -1,5 +1,6 @@
 package com.example.applux.ui.register
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -29,6 +30,7 @@ class SendCodeFragment : Fragment(R.layout.fragment_send_code) {
 
     private lateinit var binding: FragmentSendCodeBinding
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSendCodeBinding.bind(view)
@@ -52,7 +54,7 @@ class SendCodeFragment : Fragment(R.layout.fragment_send_code) {
             }
         }
         binding.registerButton.setOnClickListener {
-            phone = binding.registerPhoneEdittext.text.toString()
+            phone = binding.registerPhoneEdittext.editText?.text.toString()
             registerViewModel.sendVerificationCodeViewModel(
                 phone,
                 requireActivity(),

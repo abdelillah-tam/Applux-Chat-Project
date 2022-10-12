@@ -3,33 +3,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
-    <item android:title="Account"
+    <item android:title="@string/account"
         >
         <menu>
             <item
                 android:id="@+id/nav_savedmessages_item"
-                android:title="Saved Messages"
+                android:title="@string/saved_messages"
                 android:icon="@drawable/ic_saved_messages"
                 />
             <item
                 android:id="@+id/nav_settings_item"
-                android:title="Settings"
+                android:title="@string/settings"
                 android:icon="@drawable/ic_settings"
                 />
         </menu>
     </item>
 
 
-    <item android:title="Extra">
+    <item android:title="@string/extra">
         <menu>
             <item
                 android:id="@+id/nav_features_item"
-                android:title="Applux Features"
+                android:title="@string/applux_features"
                 android:icon="@drawable/ic_info"
                 />
             <item
                 android:id="@+id/nav_invitefriends_item"
-                android:title="Invite Friends"
+                android:title="@string/invite_friends"
                 android:icon="@drawable/ic_invite_friend"
                 />
         </menu>

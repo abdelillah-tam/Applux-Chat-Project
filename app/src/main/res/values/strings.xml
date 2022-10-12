@@ -212,6 +212,14 @@
     </string-array>
     <string name="open_navigation_drawer">Opened navigation drawer</string>
     <string name="close_navigation_drawer">Closed navigation drawer</string>
+    <string name="settings">Settings</string>
+    <string name="saved_messages">Saved Messages</string>
+    <string name="account">Account</string>
+    <string name="extra">Extra</string>
+    <string name="invite_friends">Invite Friends</string>
+    <string name="applux_features">Applux Features</string>
+    <string name="select_a_contact">Select a contact</string>
+    <string name="write_your_message">Write your message ...</string>
 
     <string-array name="privacy">
         <item>No One</item>

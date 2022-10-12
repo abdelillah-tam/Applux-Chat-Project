@@ -4,11 +4,12 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <ProgressBar
+    <com.google.android.material.progressindicator.CircularProgressIndicator
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_margin="8dp"
-        android:theme="@style/ProgressBarStyle"
+        app:trackColor="@color/orange_100"
+        app:indicatorColor="@color/orange_500"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

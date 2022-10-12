@@ -1,5 +1,6 @@
 package com.example.applux.ui.register
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,7 @@ class EnterCodeFragment : Fragment(R.layout.fragment_enter_code) {
     private lateinit var binding: FragmentEnterCodeBinding
 
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentEnterCodeBinding.bind(view)

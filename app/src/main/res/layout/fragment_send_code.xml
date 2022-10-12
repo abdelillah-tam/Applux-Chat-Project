@@ -4,28 +4,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/purple_700"
-    tools:context=".SendCodeFragment">
+    android:background="@color/white">
 
-    <EditText
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/register_phone_edittext"
         android:layout_width="match_parent"
-        android:layout_height="32dp"
-        android:layout_marginHorizontal="24dp"
-        android:background="@color/purple_200"
-        android:hint="Phone Number"
-        android:inputType="phone"
-        android:padding="4dp"
-        android:textColorHint="@color/white"
-        android:textColor="@color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="24dp" />
+        android:layout_height="wrap_content"
+        app:boxCornerRadiusBottomEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:hintTextColor="@color/orange_500"
+        android:hint="Phone number"
+        app:hintAnimationEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/register_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
         android:text="Register"
         android:textColor="@color/purple_700"
         android:textStyle="bold"

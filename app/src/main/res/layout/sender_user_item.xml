@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/purple_200"
+    android:background="@color/white"
     android:padding="12dp">
 
 
@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFamily="@font/tajawal_extrabold"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="22sp"
         android:textStyle="bold"
         android:textDirection="ltr"
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:fontFamily="@font/tajawal_regular"
-        android:textColor="#D8D8D8"
+        android:textColor="@color/grey_500"
         android:textSize="16sp"
         android:textDirection="ltr"
         app:layout_constraintBottom_toBottomOf="parent"
