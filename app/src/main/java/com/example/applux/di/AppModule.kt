@@ -31,14 +31,11 @@ import javax.inject.Singleton
 object AppModule {
 
 
-
-
     @Singleton
     @Provides
     fun provideAuth(): FirebaseAuth {
         return Firebase.auth
     }
-
 
 
     @Provides
@@ -67,8 +64,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun currentContactUserDocument(firestore: FirebaseFirestore): DocumentReference {
-        return firestore.collection("ContactUser").document(Firebase.auth.currentUser!!.uid)
+    fun currentContactUserDocument(firestore: FirebaseFirestore): DocumentReference? {
+        if (Firebase.auth.currentUser != null) {
+            return firestore.collection("ContactUser").document(Firebase.auth.currentUser!!.uid)
+        }
+        else return null
     }
 
 
@@ -78,11 +78,10 @@ object AppModule {
     }
 
 
-
     @Singleton
     @Provides
     fun contactUserRepository(
-        currentContactUserDocument: DocumentReference,
+        currentContactUserDocument: DocumentReference?,
         contactCollectionReference: CollectionReference
     ): ContactUserRepository {
         return ContactUserRepositoryImpl(currentContactUserDocument, contactCollectionReference)
@@ -91,7 +90,7 @@ object AppModule {
     @Singleton
     @Provides
     fun lastSeenRepository(
-        currentContactUserDocument: DocumentReference,
+        currentContactUserDocument: DocumentReference?,
         contactCollectionReference: CollectionReference
     ): LastSeenRepository {
         return LastSeenRepositoryImpl(currentContactUserDocument, contactCollectionReference)
@@ -100,18 +99,18 @@ object AppModule {
     @Singleton
     @Provides
     fun aboutRepository(
-        currentContactUserDocument: DocumentReference,
+        currentContactUserDocument: DocumentReference?,
         contactCollectionReference: CollectionReference
-    ) : AboutRepository{
+    ): AboutRepository {
         return AboutRepositoryImpl(currentContactUserDocument, contactCollectionReference)
     }
 
     @Singleton
     @Provides
     fun profilePictureRepository(
-        currentContactUserDocument: DocumentReference,
+        currentContactUserDocument: DocumentReference?,
         contactCollectionReference: CollectionReference
-    ) : PictureRepository{
+    ): PictureRepository {
         return PictureRepositoryImpl(currentContactUserDocument, contactCollectionReference)
     }
 
@@ -119,7 +118,7 @@ object AppModule {
     @Provides
     fun messageRepository(
         contactCollectionReference: CollectionReference
-    ) : MessageRepository{
+    ): MessageRepository {
         return MessageRepositoryImpl(contactCollectionReference)
     }
 

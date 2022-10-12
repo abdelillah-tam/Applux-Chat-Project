@@ -9,47 +9,48 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 private const val TAG = "AboutRepositoryImpl"
+
 class AboutRepositoryImpl @Inject constructor(
-    val currentContactUserDocument : DocumentReference,
-    val contactCollectionReference : CollectionReference
+    val currentContactUserDocument: DocumentReference?,
+    val contactCollectionReference: CollectionReference
 ) : AboutRepository {
 
-    override suspend fun updateAbout(about: String?) : Boolean {
+    override suspend fun updateAbout(about: String?): Boolean {
         var result = false
-        currentContactUserDocument.collection("Profile")
-            .document("about")
-            .update(mapOf("about" to about))
-            .addOnCompleteListener {
-                if (it.isSuccessful){
+        currentContactUserDocument?.collection("Profile")
+            ?.document("about")
+            ?.update(mapOf("about" to about))
+            ?.addOnCompleteListener {
+                if (it.isSuccessful) {
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 result = false
             }
-            .await()
+            ?.await()
         return result
     }
 
-    override suspend fun updateAboutPrivacy(privacy: Privacy) : Boolean {
+    override suspend fun updateAboutPrivacy(privacy: Privacy): Boolean {
         var result = false
-        currentContactUserDocument.collection("Profile")
-            .document("about")
-            .update(mapOf("privacy" to privacy))
-            .addOnCompleteListener {
-                if (it.isSuccessful){
+        currentContactUserDocument?.collection("Profile")
+            ?.document("about")
+            ?.update(mapOf("privacy" to privacy))
+            ?.addOnCompleteListener {
+                if (it.isSuccessful) {
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 result = false
             }
-            .await()
+            ?.await()
 
         return result
     }
 
-    override suspend fun getAbout(uid: String) : About?{
+    override suspend fun getAbout(uid: String): About? {
         val about = contactCollectionReference.document(uid)
             .collection("Profile")
             .document("about")
@@ -58,21 +59,19 @@ class AboutRepositoryImpl @Inject constructor(
         return about
     }
 
-    override suspend fun getAbout() : About?{
-            val about = currentContactUserDocument
-                .collection("Profile")
-                .document("about")
-                .get()
-                .await().toObject(About::class.java)
-            return about
+    override suspend fun getAbout(): About? {
+        val about = currentContactUserDocument
+            ?.collection("Profile")
+            ?.document("about")
+            ?.get()
+            ?.await()?.toObject(About::class.java)
+        return about
     }
 
     override fun createAbout() {
-        currentContactUserDocument
-            .collection("Profile")
-            .document("about")
-            .set(About("", Privacy.PUBLIC))
-            .addOnFailureListener {
+        currentContactUserDocument?.collection("Profile")?.document("about")
+            ?.set(About("", Privacy.PUBLIC))
+            ?.addOnFailureListener {
                 Log.e(TAG, "createAbout: ", it)
             }
 

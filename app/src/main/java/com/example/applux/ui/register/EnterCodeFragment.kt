@@ -10,19 +10,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.navArgs
-import com.example.applux.OnlineOrOffline
-import com.example.applux.Privacy
 import com.example.applux.R
 import com.example.applux.databinding.FragmentEnterCodeBinding
-import com.example.applux.domain.models.About
-import com.example.applux.domain.models.ContactUser
-import com.example.applux.domain.models.LastSeen
 import com.example.applux.ui.MainActivity
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
@@ -43,22 +35,20 @@ class EnterCodeFragment : Fragment(R.layout.fragment_enter_code) {
         binding = FragmentEnterCodeBinding.bind(view)
 
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
                 registerViewModel.state.collect {
-                    if (it.verificationId != null){
+                    if (it.verificationId != null) {
                         verificationId = it.verificationId
                     }
-                    if (it.phone != null){
+                    if (it.phone != null) {
                         phone = it.phone
                     }
-                    if (it.isExist){
+                    if (it.isExist) {
                         val intent = Intent(context, MainActivity::class.java)
                         startActivity(intent)
                         requireActivity().finish()
-                    }else{
-                        registerViewModel.createCompleteAccountViewModel(phone)
                     }
-                    if (it.isSignedIn){
+                    if (it.isSignedIn) {
                         val intent = Intent(context, MainActivity::class.java)
                         startActivity(intent)
                         requireActivity().finish()
@@ -69,7 +59,7 @@ class EnterCodeFragment : Fragment(R.layout.fragment_enter_code) {
         }
 
         binding.buttonVerify.setOnClickListener {
-            val code = binding.codeVerify.text.toString()
+            val code = binding.codeVerify.editText?.text.toString()
             verificationCode(code)
         }
 
@@ -77,11 +67,9 @@ class EnterCodeFragment : Fragment(R.layout.fragment_enter_code) {
 
 
     private fun verificationCode(code: String) {
-        if (verificationId != null) {
-            Log.e("TAG", "verificationCode: " + code)
-            val credential = PhoneAuthProvider.getCredential(verificationId, code)
-            registerViewModel.signInWithCredentialViewModel(credential, phone)
-        }
+        Log.e("TAG", "verificationCode: " + code)
+        val credential = PhoneAuthProvider.getCredential(verificationId, code)
+        registerViewModel.signInWithCredentialViewModel(credential, phone)
     }
 
 

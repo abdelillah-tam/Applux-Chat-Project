@@ -1,7 +1,6 @@
 package com.example.applux.data.firebase.profilepicture
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.example.applux.Privacy
 import com.example.applux.domain.models.Picture
 import com.google.firebase.auth.ktx.auth
@@ -15,14 +14,14 @@ import javax.inject.Inject
 private const val TAG = "ProfilePictureRepositor"
 
 class PictureRepositoryImpl @Inject constructor(
-    val currentContactUserDocument: DocumentReference,
+    val currentContactUserDocument: DocumentReference?,
     val contactCollectionReference: CollectionReference
 ) : PictureRepository {
 
-    val profilePictureBytesLiveDate = MutableLiveData<ByteArray>()
+    //val profilePictureBytesLiveDate = MutableLiveData<ByteArray>()
 
     override suspend fun getProfilePic(uid: String): Picture? {
-        var profilePic = contactCollectionReference.document(uid)
+        val profilePic = contactCollectionReference.document(uid)
             .collection("Profile")
             .document("profilepic")
             .get()
@@ -33,10 +32,10 @@ class PictureRepositoryImpl @Inject constructor(
 
     override suspend fun getProfilePic(): Picture? {
         val profilePic = currentContactUserDocument
-            .collection("Profile")
-            .document("profilepic")
-            .get()
-            .await().toObject(Picture::class.java)
+            ?.collection("Profile")
+            ?.document("profilepic")
+            ?.get()
+            ?.await()?.toObject(Picture::class.java)
 
         return profilePic
     }
@@ -44,34 +43,34 @@ class PictureRepositoryImpl @Inject constructor(
 
     override suspend fun updateProfilePicturePrivacy(privacy: Privacy): Boolean {
         var result = false
-        currentContactUserDocument.collection("Profile")
-            .document("profilepic")
-            .update(mapOf("privacy" to privacy))
-            .addOnCompleteListener {
+        currentContactUserDocument?.collection("Profile")
+            ?.document("profilepic")
+            ?.update(mapOf("privacy" to privacy))
+            ?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 result = false
-            }.await()
+            }?.await()
         return result
     }
 
     override suspend fun updateProfilePictureFileName(fileName: String): Boolean {
         var result = false
-        currentContactUserDocument.collection("Profile")
-            .document("profilepic")
-            .update(mapOf("pic" to fileName))
-            .addOnCompleteListener {
+        currentContactUserDocument?.collection("Profile")
+            ?.document("profilepic")
+            ?.update(mapOf("pic" to fileName))
+            ?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 result = false
             }
-            .await()
+            ?.await()
         return result
     }
 

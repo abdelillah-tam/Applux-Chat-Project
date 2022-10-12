@@ -10,22 +10,22 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 private const val TAG = "LastSeenRepositoryImpl"
 class LastSeenRepositoryImpl @Inject constructor(
-    private val currentContactUserDocument: DocumentReference,
+    private val currentContactUserDocument: DocumentReference?,
     private val contactCollectionReference: CollectionReference
 
 ) : LastSeenRepository {
 
 
     override suspend fun getLastSeen(): LastSeen? {
-        var lastSeen = currentContactUserDocument.collection("Profile")
-            .document("lastseen")
-            .get()
-            .await().toObject(LastSeen::class.java)
+        val lastSeen = currentContactUserDocument?.collection("Profile")
+            ?.document("lastseen")
+            ?.get()
+            ?.await()?.toObject(LastSeen::class.java)
         return lastSeen
     }
 
     override suspend fun getLastSeen(uid: String): LastSeen? {
-        var lastSeen = contactCollectionReference.document(uid)
+        val lastSeen = contactCollectionReference.document(uid)
             .collection("Profile")
             .document("lastseen")
             .get().await().toObject(LastSeen::class.java)
@@ -33,33 +33,33 @@ class LastSeenRepositoryImpl @Inject constructor(
     }
 
     override fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline) {
-        currentContactUserDocument.collection("Profile")
-            .document("lastseen")
-            .update(mapOf("timestamp" to timestamp, "onlineOrOffline" to onlineOrOffline))
+        currentContactUserDocument?.collection("Profile")
+            ?.document("lastseen")
+            ?.update(mapOf("timestamp" to timestamp, "onlineOrOffline" to onlineOrOffline))
     }
 
     override suspend fun updateLastSeenPrivacy(privacy: Privacy) : Boolean{
         var result = false
-        currentContactUserDocument.collection("Profile")
-            .document("lastseen")
-            .update(mapOf("privacy" to privacy))
-            .addOnCompleteListener {
+        currentContactUserDocument?.collection("Profile")
+            ?.document("lastseen")
+            ?.update(mapOf("privacy" to privacy))
+            ?.addOnCompleteListener {
                 if (it.isSuccessful){
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 Log.e(TAG, "updateLastSeenPrivacy: ", it )
                 result = false
             }
-            .await()
+            ?.await()
 
         return result
     }
 
     override fun createFirstLastSeen(lastSeen: LastSeen) {
-        currentContactUserDocument.collection("Profile")
-            .document("lastseen")
-            .set(lastSeen)
+        currentContactUserDocument?.collection("Profile")
+            ?.document("lastseen")
+            ?.set(lastSeen)
     }
 }

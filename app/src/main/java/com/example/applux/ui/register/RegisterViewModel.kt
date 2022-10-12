@@ -46,15 +46,16 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             signInWithCredential(p0).collect { result ->
                 if (result){
-                    checkIfContactAlreadyExist(phone).collect { result ->
-                        if (result){
+                    checkIfContactAlreadyExist(phone).collect { exist ->
+                        if (exist){
                             _state.update {
-                                it.copy(isExist = result)
+                                it.copy(isExist = exist)
                             }
                         }else{
                             _state.update {
-                                it.copy(isExist = result)
+                                it.copy(isExist = exist)
                             }
+                            createCompleteAccountViewModel(phone)
                         }
                     }
 
@@ -63,7 +64,7 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun createCompleteAccountViewModel(phone: String){
+    private fun createCompleteAccountViewModel(phone: String){
         viewModelScope.launch {
             val contactUser = ContactUser(auth.currentUser!!.uid,
                 phone,

@@ -19,7 +19,7 @@ import javax.inject.Inject
 private const val TAG = "ContactUserRepositoryIm"
 
 class ContactUserRepositoryImpl @Inject constructor(
-    val currentContactUserDocument: DocumentReference,
+    val currentContactUserDocument: DocumentReference?,
     val contactCollectionReference: CollectionReference
 ) : ContactUserRepository {
 
@@ -28,7 +28,7 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun createContactUser(contactUser: ContactUser): Boolean {
         var result = false
-        currentContactUserDocument.set(contactUser)
+        contactCollectionReference.document(auth.currentUser!!.uid).set(contactUser)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     result = true
@@ -45,23 +45,21 @@ class ContactUserRepositoryImpl @Inject constructor(
     override suspend fun findContactUser(
         contacts: HashMap<String, String>
     ) : Flow<ArrayList<ContactUser>> = flow {
-        if (contacts != null) {
-            val contactsList = ArrayList<ContactUser>()
-            val contactsvalues: ArrayList<String> = ArrayList(contacts.values.toList())
-            val chuncked = contactsvalues.chunked(10)
+        val contactsList = ArrayList<ContactUser>()
+        val contactsvalues: ArrayList<String> = ArrayList(contacts.values.toList())
+        val chuncked = contactsvalues.chunked(10)
 
-            chuncked.forEach {
-                val p = contactCollectionReference.whereIn("phone", it).get().await()
-                p.documents.forEach {
-                    val contact = it.toObject(ContactUser::class.java)
-                    if (contact != null && !contact!!.uid.equals(auth.currentUser!!.uid)) {
-                        contactsList.add(contact)
-                    }
+        chuncked.forEach {
+            val p = contactCollectionReference.whereIn("phone", it).get().await()
+            p.documents.forEach {
+                val contact = it.toObject(ContactUser::class.java)
+                if (contact != null && !contact.uid.equals(auth.currentUser!!.uid)) {
+                    contactsList.add(contact)
                 }
-
             }
-            emit(contactsList)
+
         }
+        emit(contactsList)
     }
 
     override fun getContactByUid(uid: String): Flow<ContactUser?> = flow {
@@ -95,10 +93,10 @@ class ContactUserRepositoryImpl @Inject constructor(
     }
 
     override fun getCurrentContact(): Flow<ContactUser?> = flow {
-        var contactUser: ContactUser? = null
+        val contactUser: ContactUser?
         contactUser = currentContactUserDocument
-            .get()
-            .await().toObject(ContactUser::class.java)
+            ?.get()
+            ?.await()?.toObject(ContactUser::class.java)
         emit(contactUser)
 
     }
@@ -106,17 +104,17 @@ class ContactUserRepositoryImpl @Inject constructor(
     override suspend fun updateUsername(username: String): Boolean {
         var result = false
         currentContactUserDocument
-            .update(mapOf("name" to username))
-            .addOnCompleteListener {
+            ?.update(mapOf("name" to username))
+            ?.addOnCompleteListener {
                 if (it.isSuccessful) {
                     result = true
                 }
             }
-            .addOnFailureListener {
+            ?.addOnFailureListener {
                 Log.e(TAG, "updateUsername: ", it)
                 result = false
             }
-            .await()
+            ?.await()
         return result
     }
 

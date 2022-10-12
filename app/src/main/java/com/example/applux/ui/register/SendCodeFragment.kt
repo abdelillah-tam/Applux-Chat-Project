@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.example.applux.R
@@ -16,7 +15,6 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -42,8 +40,6 @@ class SendCodeFragment : Fragment(R.layout.fragment_send_code) {
                         val intent = Intent(context, MainActivity::class.java)
                         startActivity(intent)
                         requireActivity().finish()
-                    }else{
-                        registerViewModel.createCompleteAccountViewModel(phone)
                     }
                     if (it.isSignedIn){
                         val intent = Intent(context, MainActivity::class.java)
@@ -76,11 +72,9 @@ class SendCodeFragment : Fragment(R.layout.fragment_send_code) {
         override fun onCodeSent(p0: String, p1: PhoneAuthProvider.ForceResendingToken) {
             super.onCodeSent(p0, p1)
             verificationId = p0
-            if (verificationId != null) {
-                registerViewModel.savePhone(phone)
-                registerViewModel.saveVerificationId(verificationId)
-                findNavController().navigate(R.id.action_sendCodeFragment_to_enterCodeFragment)
-            }
+            registerViewModel.savePhone(phone)
+            registerViewModel.saveVerificationId(verificationId)
+            findNavController().navigate(R.id.action_sendCodeFragment_to_enterCodeFragment)
         }
     }
 }

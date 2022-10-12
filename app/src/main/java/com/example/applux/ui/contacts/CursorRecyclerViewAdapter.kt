@@ -1,15 +1,13 @@
 package com.example.applux.ui.contacts
 
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
-import com.example.applux.domain.models.ContactUser
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.scopes.FragmentScoped
-import de.hdodenhof.circleimageview.CircleImageView
 import javax.inject.Inject
 
 @FragmentScoped
@@ -18,7 +16,11 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
 
     private var contactsUsers = ArrayList<ContactsItemUiState>()
 
-    class Holder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class Holder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val contactPic = itemView.findViewById(R.id.circleContactPic) as ShapeableImageView
+        val nameTextView = itemView.findViewById(R.id.contact_name_textview) as MaterialTextView
+        val numberTextView = itemView.findViewById(R.id.contact_number_textview) as MaterialTextView
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -31,16 +33,13 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
         val getName = contact.contactUser?.name
         val getNumber = contact.contactUser?.phone
 
-        val contactPic = holder.itemView.findViewById(R.id.circleContactPic) as CircleImageView
-        val nameTextView = holder.itemView.findViewById(R.id.contact_name_textview) as TextView
-        val numberTextView = holder.itemView.findViewById(R.id.contact_number_textview) as TextView
 
-        nameTextView.text = getName
-        numberTextView.text = getNumber
+        holder.nameTextView.text = getName
+        holder.numberTextView.text = getNumber
         if (contact.profileBitmap == null){
-            contactPic.setImageResource(R.drawable.ic_face)
+            holder.contactPic.setImageResource(R.drawable.ic_face)
         }else{
-            contactPic.setImageBitmap(contact.profileBitmap)
+            holder.contactPic.setImageBitmap(contact.profileBitmap)
         }
 
     }
@@ -48,6 +47,7 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
     override fun getItemCount(): Int {
         return contactsUsers.size
     }
+
 
     fun setContactsFromFirebase(contacts: ArrayList<ContactsItemUiState>){
         contactsUsers = contacts

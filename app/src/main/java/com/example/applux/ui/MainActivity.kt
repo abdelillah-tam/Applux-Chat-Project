@@ -1,15 +1,16 @@
 package com.example.applux.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.applux.R
+import com.example.applux.ui.register.RegisterActivity
 import com.google.firebase.FirebaseApp
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.ktx.firestoreSettings
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -35,15 +36,17 @@ class MainActivity : AppCompatActivity() {
         )
 
 
-       /* if (auth.currentUser?.uid == null){
-            val intent = Intent(this,RegisterActivity::class.java)
+        if (auth.currentUser?.uid == null){
+            val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
             finish()
-        }*/
+        }else{
+            navHost = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+        }
 
         //val currentContact : ContactUser? = intent.getParcelableExtra("currentUser")
 
-        navHost = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
+
 
     }
 
