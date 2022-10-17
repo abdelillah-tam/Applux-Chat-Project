@@ -145,7 +145,7 @@ class SettingsViewModel @Inject constructor(
                             if (result) {
                                 val messages = uiState.userMessages + UserMessage(
                                     id = UUID.randomUUID().mostSignificantBits,
-                                    message = "About is updated successfully"
+                                    message = "Username is updated successfully"
                                 )
                                 uiState.copy(userMessages = messages)
                             } else {

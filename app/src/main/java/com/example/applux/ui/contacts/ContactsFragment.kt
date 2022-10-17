@@ -21,6 +21,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
 import com.example.applux.databinding.FragmentContactsBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,56 +63,55 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
                 662
             )
         }
-/*        gesture = GestureDetectorCompat(context, object : GestureDetector.OnGestureListener {
-            override fun onDown(p0: MotionEvent?): Boolean {
+        gesture = GestureDetectorCompat(requireContext(), object : GestureDetector.OnGestureListener {
+            override fun onDown(p0: MotionEvent): Boolean {
                 return false
             }
 
-            override fun onShowPress(p0: MotionEvent?) {
+            override fun onShowPress(p0: MotionEvent) {
 
             }
 
-            override fun onSingleTapUp(p0: MotionEvent?): Boolean {
-                val view = binding.contactListView.findChildViewUnder(p0!!.x, p0!!.y)
+            override fun onSingleTapUp(p0: MotionEvent): Boolean {
+                val view = binding.contactListView.findChildViewUnder(p0.x, p0.y)
                 if (view != null) {
-                    val position = binding.contactListView.getChildAdapterPosition(view!!)
+                    val position = binding.contactListView.getChildAdapterPosition(view)
                     val contactUser = curListAdap.getContact(position)
-                    if (contactUser != null) {
-                        val action =
-                            ContactsFragmentDirections.actionContactsFragmentToChatchannelFragment(
-                                contactUser
-                            )
-                        findNavController().navigate(action)
-                    }
+                    val action =
+                        ContactsFragmentDirections.actionContactsFragmentToChatchannelFragment(
+                            contactUser.contactUser, null
+                        )
+                    findNavController().navigate(action)
                 }
                 return true
             }
 
             override fun onScroll(
-                p0: MotionEvent?,
-                p1: MotionEvent?,
+                p0: MotionEvent,
+                p1: MotionEvent,
                 p2: Float,
                 p3: Float
             ): Boolean {
                 return false
             }
 
-            override fun onLongPress(p0: MotionEvent?) {
+            override fun onLongPress(p0: MotionEvent) {
 
             }
 
             override fun onFling(
-                p0: MotionEvent?,
-                p1: MotionEvent?,
+                p0: MotionEvent,
+                p1: MotionEvent,
                 p2: Float,
                 p3: Float
             ): Boolean {
                 return false
             }
-        })*/
+        })
 
 
     }
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentContactsBinding.bind(view)
@@ -119,13 +119,13 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = curListAdap
         }
-      /*  binding.contactListView.addOnItemTouchListener(object :
+        binding.contactListView.addOnItemTouchListener(object :
             RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 gesture.onTouchEvent(e)
                 return false
             }
-        })*/
+        })
 
         val acti = (activity as AppCompatActivity)
         setHasOptionsMenu(true)

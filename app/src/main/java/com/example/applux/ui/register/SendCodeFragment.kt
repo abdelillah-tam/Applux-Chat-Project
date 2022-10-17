@@ -10,7 +10,7 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.example.applux.R
 import com.example.applux.databinding.FragmentSendCodeBinding
-import com.example.applux.ui.MainActivity
+import com.example.applux.ui.main.MainActivity
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider

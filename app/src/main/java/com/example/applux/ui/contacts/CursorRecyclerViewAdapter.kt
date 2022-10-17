@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
+import com.example.applux.domain.models.Contact
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.scopes.FragmentScoped
@@ -54,8 +55,8 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
         notifyDataSetChanged()
     }
 
-   /* fun getContact(position: Int) : ContactUser{
+    fun getContact(position: Int) : ContactsItemUiState {
         return contactsUsers.get(position)
-    }*/
+    }
 }
 

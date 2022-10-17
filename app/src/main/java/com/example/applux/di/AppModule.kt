@@ -1,8 +1,8 @@
 package com.example.applux.di
 
 import androidx.fragment.app.FragmentActivity
-import com.example.applux.ui.MainActivity
-import com.example.applux.ui.MainFragment
+import com.example.applux.ui.main.MainActivity
+import com.example.applux.ui.main.MainFragment
 import com.example.applux.data.firebase.about.AboutRepository
 import com.example.applux.data.firebase.about.AboutRepositoryImpl
 import com.example.applux.data.firebase.contactuser.ContactUserRepository

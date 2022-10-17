@@ -11,7 +11,9 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.applux.R
 import com.example.applux.databinding.FragmentProfileBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private lateinit var binding: FragmentProfileBinding
@@ -19,7 +21,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val contactArg : ProfileFragmentArgs by navArgs()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    //    super.onViewCreated(view, savedInstanceState)
         binding = FragmentProfileBinding.bind(view)
         binding.toolbarOfProfilefrag.title = ""
 

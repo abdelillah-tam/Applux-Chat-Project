@@ -5,7 +5,6 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:openDrawer="left"
     >
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,7 +12,7 @@
         android:layout_height="match_parent"
         android:background="@color/white"
         android:elevation="0dp"
-        tools:context=".ui.MainFragment">
+        tools:context=".ui.main.MainFragment">
 
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/appBarLayout2"
@@ -52,6 +51,7 @@
             android:fitsSystemWindows="false"
             app:layout_constraintTop_toBottomOf="@+id/appBarLayout2"
             app:tabSelectedTextColor="@color/orange_500"
+            app:tabIndicatorColor="@color/orange_500"
             app:tabTextColor="@color/grey_300" />
 
         <androidx.viewpager2.widget.ViewPager2

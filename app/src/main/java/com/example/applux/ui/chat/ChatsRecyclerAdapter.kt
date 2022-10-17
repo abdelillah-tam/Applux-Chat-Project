@@ -4,45 +4,45 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
+import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.scopes.FragmentScoped
-import de.hdodenhof.circleimageview.CircleImageView
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @FragmentScoped
-class ChatsRecyclerAdapter @Inject constructor() : RecyclerView.Adapter<ChatsRecyclerAdapter.ChatViewHolder>(){
+class ChatsRecyclerAdapter @Inject constructor() :
+    RecyclerView.Adapter<ChatsRecyclerAdapter.ChatViewHolder>() {
 
     private var setOfUsers = ArrayList<ChatItemUiState>()
-    class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
+    class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val contactImage = itemView.findViewById(R.id.contactImage) as ShapeableImageView
+        val contactName = itemView.findViewById(R.id.contactName) as MaterialTextView
+        val contactLastMsg = itemView.findViewById(R.id.contactLastMessage) as MaterialTextView
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChatViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.sender_user_item, parent, false)
+        val view =
+            LayoutInflater.from(parent.context).inflate(R.layout.sender_user_item, parent, false)
         return ChatViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
-        val contactImage = holder.itemView.findViewById(R.id.contactImage) as CircleImageView
-        val contactName = holder.itemView.findViewById(R.id.contactName) as TextView
-        val contactLastMsg = holder.itemView.findViewById(R.id.contactLastMessage) as TextView
 
         val chatItemUiState = setOfUsers.elementAt(position)
 
         if (chatItemUiState.profileBitmap != null) {
-            contactImage.setImageBitmap(chatItemUiState.profileBitmap)
+            holder.contactImage.setImageBitmap(chatItemUiState.profileBitmap)
         }
         if (chatItemUiState.message != null) {
-            contactLastMsg.text = chatItemUiState.message!!.text
+            holder.contactLastMsg.text = chatItemUiState.message!!.text
         }
         if (chatItemUiState.contactUser != null) {
-            contactName.text = chatItemUiState.contactUser!!.name
+            holder.contactName.text = chatItemUiState.contactUser!!.name
         }
 
     }
@@ -52,27 +52,38 @@ class ChatsRecyclerAdapter @Inject constructor() : RecyclerView.Adapter<ChatsRec
     }
 
 
+    fun setAllUsers(array: ArrayList<ChatItemUiState>) {
+        val diffCallback = diff(setOfUsers, array)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
 
-    fun setAllUsers(array: ArrayList<ChatItemUiState>, newUpdate: ChatItemUiState?){
-        GlobalScope.launch(Dispatchers.IO) {
-            if (!array.isEmpty() && newUpdate == null) {
-                setOfUsers = array
-                withContext(Dispatchers.Main) {
-                    notifyDataSetChanged()
-                }
-            } else if (!array.isEmpty() && newUpdate != null) {
-                setOfUsers = array
-                val position = setOfUsers.indexOf(newUpdate)
-                withContext(Dispatchers.Main) {
-                    notifyItemChanged(position)
-                }
-            }
-        }
+        setOfUsers.clear()
+        setOfUsers.addAll(array)
+        diffResult.dispatchUpdatesTo(this)
     }
 
-    fun getChatItem(position: Int) : ChatItemUiState{
+    fun getChatItem(position: Int): ChatItemUiState {
         return setOfUsers.elementAt(position)
     }
 
+    class diff(
+        val oldList: List<ChatItemUiState>,
+        val newList: List<ChatItemUiState>
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
 
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].message!!.equals(newList[newItemPosition].message)
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].equals(newList[newItemPosition])
+        }
+
+    }
 }

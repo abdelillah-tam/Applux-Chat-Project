@@ -6,6 +6,7 @@ import com.example.applux.domain.models.Picture
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.tasks.await
@@ -43,34 +44,57 @@ class PictureRepositoryImpl @Inject constructor(
 
     override suspend fun updateProfilePicturePrivacy(privacy: Privacy): Boolean {
         var result = false
-        currentContactUserDocument?.collection("Profile")
-            ?.document("profilepic")
-            ?.update(mapOf("privacy" to privacy))
-            ?.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    result = true
+        try {
+            currentContactUserDocument?.collection("Profile")
+                ?.document("profilepic")
+                ?.update(mapOf("privacy" to privacy))
+                ?.addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        result = true
+                    }
                 }
-            }
-            ?.addOnFailureListener {
+                ?.addOnFailureListener {
+                    result = false
+                }?.await()
+        }catch (exc : FirebaseFirestoreException){
+            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
                 result = false
-            }?.await()
+            }
+        }
         return result
     }
 
     override suspend fun updateProfilePictureFileName(fileName: String): Boolean {
         var result = false
-        currentContactUserDocument?.collection("Profile")
-            ?.document("profilepic")
-            ?.update(mapOf("pic" to fileName))
-            ?.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    result = true
+        try {
+            currentContactUserDocument?.collection("Profile")
+                ?.document("profilepic")
+                ?.update(mapOf("pic" to fileName))
+                ?.addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        result = true
+                    }
                 }
+                ?.addOnFailureListener {
+                    result = false
+                }
+                ?.await()
+        }catch (exc : FirebaseFirestoreException){
+            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
+                currentContactUserDocument?.collection("Profile")
+                    ?.document("profilepic")
+                    ?.set(Picture(fileName, Privacy.PUBLIC))
+                    ?.addOnCompleteListener {
+                        if (it.isSuccessful){
+                            result = true
+                        }
+                    }
+                    ?.addOnFailureListener {
+                        result = false
+                    }
+                    ?.await()
             }
-            ?.addOnFailureListener {
-                result = false
-            }
-            ?.await()
+        }
         return result
     }
 

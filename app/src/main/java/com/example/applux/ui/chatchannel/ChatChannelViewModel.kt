@@ -33,7 +33,7 @@ class ChatChannelViewModel @Inject constructor(
 
 
     fun getProfilePictureAndContactFromFragmentViewModel(
-        pictureBitmap: Bitmap,
+        pictureBitmap: Bitmap?,
         contactUser: ContactUser
     ) {
         viewModelScope.launch {

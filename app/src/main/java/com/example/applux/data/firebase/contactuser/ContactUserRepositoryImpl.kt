@@ -9,6 +9,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -103,18 +104,24 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun updateUsername(username: String): Boolean {
         var result = false
-        currentContactUserDocument
-            ?.update(mapOf("name" to username))
-            ?.addOnCompleteListener {
-                if (it.isSuccessful) {
-                    result = true
+        try {
+            currentContactUserDocument
+                ?.update(mapOf("name" to username))
+                ?.addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        result = true
+                    }
                 }
+                ?.addOnFailureListener {
+                    Log.e(TAG, "updateUsername: ", it)
+                    result = false
+                }
+                ?.await()
+        }catch (exc : FirebaseFirestoreException){
+            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
+
             }
-            ?.addOnFailureListener {
-                Log.e(TAG, "updateUsername: ", it)
-                result = false
-            }
-            ?.await()
+        }
         return result
     }
 
@@ -147,7 +154,7 @@ class ContactUserRepositoryImpl @Inject constructor(
             .addOnFailureListener {
                 Log.e(TAG, "signInWithCredential: ", it)
                 result = false
-            }
+            }.await()
 
 
         return result

@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="@string/account"
-        >
+    <item android:title="@string/account">
         <menu>
             <item
                 android:id="@+id/nav_savedmessages_item"
-                android:title="@string/saved_messages"
                 android:icon="@drawable/ic_saved_messages"
-                />
+                android:title="@string/saved_messages" />
             <item
                 android:id="@+id/nav_settings_item"
-                android:title="@string/settings"
                 android:icon="@drawable/ic_settings"
-                />
+                android:title="@string/settings" />
         </menu>
     </item>
 
@@ -24,15 +20,16 @@
         <menu>
             <item
                 android:id="@+id/nav_features_item"
-                android:title="@string/applux_features"
                 android:icon="@drawable/ic_info"
-                />
+                android:title="@string/applux_features" />
             <item
                 android:id="@+id/nav_invitefriends_item"
-                android:title="@string/invite_friends"
                 android:icon="@drawable/ic_invite_friend"
-                />
+                android:title="@string/invite_friends" />
         </menu>
     </item>
 
+    <item
+        android:id="@+id/nav_logout"
+        android:title="@string/log_out" />
 </menu>

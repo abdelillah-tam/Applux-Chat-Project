@@ -1,5 +1,6 @@
 package com.example.applux.ui.chatchannel
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
@@ -40,12 +41,13 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
     @Inject lateinit var chatchannelAdapter: ChatchannelAdapter
 
 
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Log.e("TAG", "onViewCreated: called")
         binding = FragmentChatchannelBinding.bind(view)
-        val contact: ContactUser = contactValue.contact
-        val profileBitmap : Bitmap = contactValue.profileBitmap
+        val contact: ContactUser = contactValue.contact!!
+        val profileBitmap : Bitmap? = contactValue.profileBitmap
         var about: About? = null
 
         chatChannelViewModel.getProfilePictureAndContactFromFragmentViewModel(contactUser = contact, pictureBitmap = profileBitmap)

@@ -225,6 +225,15 @@
     <string name="your_phone_number">Your phone number …</string>
     <string name="verifying_code">Verifying code …</string>
     <string name="verify">Verify</string>
+    <string name="about_and_phone_number">About and phone number</string>
+    <string name="your_phone">Your phone</string>
+    <string name="username">Username</string>
+    <string name="read_receipts">Read receipts</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="last_seen">Last seen</string>
+    <string name="about">About</string>
+    <string name="privacy">Privacy</string>
+    <string name="log_out">Log out</string>
 
     <string-array name="privacy">
         <item>No One</item>

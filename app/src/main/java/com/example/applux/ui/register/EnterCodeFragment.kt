@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.example.applux.R
 import com.example.applux.databinding.FragmentEnterCodeBinding
-import com.example.applux.ui.MainActivity
+import com.example.applux.ui.main.MainActivity
 import com.google.firebase.auth.PhoneAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

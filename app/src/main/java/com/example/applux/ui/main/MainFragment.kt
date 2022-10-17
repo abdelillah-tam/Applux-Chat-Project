@@ -1,5 +1,6 @@
-package com.example.applux.ui
+package com.example.applux.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.activity.OnBackPressedCallback
@@ -18,8 +19,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.applux.R
 import com.example.applux.ui.chat.ChatFragment
 import com.example.applux.databinding.FragmentMainBinding
+import com.example.applux.ui.register.RegisterActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -119,6 +123,16 @@ class MainFragment : Fragment(R.layout.fragment_main),
             R.id.nav_settings_item -> {
                 findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                 true
+            }
+
+            R.id.nav_logout ->{
+                if (Firebase.auth.currentUser != null){
+                    Firebase.auth.signOut()
+                    val intent = Intent(requireContext(), RegisterActivity::class.java)
+                    startActivity(intent)
+                    activity?.finish()
+                }
+                return true
             }
 
             else -> false

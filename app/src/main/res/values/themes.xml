@@ -57,6 +57,6 @@
     </style>
 
     <style name="extendOutlinedBox" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="android:background">@drawable/edittext_shape</item>
+        <item name="android:background">@drawable/radius_shape</item>
     </style>
 </resources>

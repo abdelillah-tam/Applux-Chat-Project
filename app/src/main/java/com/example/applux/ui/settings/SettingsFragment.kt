@@ -1,6 +1,7 @@
 package com.example.applux.ui.settings
 
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.provider.MediaStore
@@ -15,12 +16,14 @@ import android.widget.AutoCompleteTextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.Glide
 import com.example.applux.Privacy
@@ -33,7 +36,6 @@ import com.example.applux.domain.models.ContactUser
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -49,6 +51,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private lateinit var bitmap: Bitmap
     private lateinit var loading: AlertDialog
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSettingsBinding.bind(view)
@@ -72,6 +75,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
 
         Log.e("TAG", "onViewCreated: " + state.value.contactUser?.name)
+        if (state.value.contactUser != null) {
+            currentContact = state.value.contactUser!!
+        }
         var actionMode: android.view.ActionMode?
 
 
@@ -92,6 +98,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 item: MenuItem?
             ): Boolean {
                 when (item?.itemId) {
+                    R.id.home ->{}
                     R.id.save -> {
                         val loadingBinding = LoadingBinding.inflate(layoutInflater)
                         loading = MaterialAlertDialogBuilder(requireContext())
@@ -99,6 +106,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                             .show()
                         settingsViewModel.onEvent(SettingsEvent.UploadProfilePicture(bitmap))
                     }
+
                 }
                 return false
             }
@@ -108,8 +116,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
 
         }
-
-
+        
         val getContent = registerForActivityResult(ActivityResultContracts.GetContent()) {
             if (it != null) {
                 Glide.with(requireContext())
@@ -125,8 +132,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 state.collect {
-
                     if (it.contactUser != null) {
+                        currentContact = state.value.contactUser!!
                         binding.coll.title = state.value.contactUser!!.name
                         binding.settingsPhonenumber.text = state.value.contactUser!!.phone
                         binding.settingsUsername.text = state.value.contactUser!!.name
@@ -135,7 +142,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     if (it.picture != null) {
 
                         if (it.picture.pic.equals("") || it.picture.privacy.equals(Privacy.NONOE)) {
-                            binding.settingsProfilePic.setImageDrawable(resources.getDrawable(R.drawable.ic_face))
+                            binding.settingsProfilePic.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_face, null))
                         }
 
                         when (it.picture.privacy) {
@@ -203,7 +210,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             valueBinding.editValues.hint = "Edit your username"
             valueBinding.editValues.editText?.text =
                 Editable.Factory.getInstance().newEditable(currentContact.name)
-            MaterialAlertDialogBuilder(requireContext())
+            loading = MaterialAlertDialogBuilder(requireContext())
                 .setView(valueBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     settingsViewModel.onEvent(SettingsEvent.UpdateUsername(valueBinding.editValues.editText?.text.toString()))
@@ -221,7 +228,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 valueBinding.editValues.editText?.text =
                     Editable.Factory.getInstance().newEditable(state.value.about!!.about)
             }
-            MaterialAlertDialogBuilder(requireContext())
+            loading = MaterialAlertDialogBuilder(requireContext())
                 .setView(valueBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     settingsViewModel.onEvent(SettingsEvent.UpdateAbout(valueBinding.editValues.editText?.text.toString()))
@@ -237,22 +244,24 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             val privacyBinding = EditPrivaciesBinding.inflate(layoutInflater)
             val autoComTxtView =
                 (privacyBinding.editPrivacies.editText as? AutoCompleteTextView)
-            when (state.value.lastSeen!!.privacy) {
-                Privacy.NONOE -> {
-                    autoComTxtView?.text =
-                        Editable.Factory.getInstance().newEditable(adapter.getItem(0))
-                }
-                Privacy.CONTACTS -> {
-                    autoComTxtView?.text =
-                        Editable.Factory.getInstance().newEditable(adapter.getItem(1))
-                }
-                else -> {
-                    autoComTxtView?.text =
-                        Editable.Factory.getInstance().newEditable(adapter.getItem(2))
+            if (state.value.lastSeen != null) {
+                when (state.value.lastSeen!!.privacy) {
+                    Privacy.NONOE -> {
+                        autoComTxtView?.text =
+                            Editable.Factory.getInstance().newEditable(adapter.getItem(0))
+                    }
+                    Privacy.CONTACTS -> {
+                        autoComTxtView?.text =
+                            Editable.Factory.getInstance().newEditable(adapter.getItem(1))
+                    }
+                    else -> {
+                        autoComTxtView?.text =
+                            Editable.Factory.getInstance().newEditable(adapter.getItem(2))
+                    }
                 }
             }
             autoComTxtView?.setAdapter(adapter)
-            MaterialAlertDialogBuilder(requireContext())
+            loading = MaterialAlertDialogBuilder(requireContext())
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {
@@ -272,7 +281,6 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 .show()
         }
-
         binding.settingsPrivacyProfilephoto.setOnClickListener{
             val privacyBinding = EditPrivaciesBinding.inflate(layoutInflater)
             val autoComTxtView =
@@ -292,7 +300,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
             }
             autoComTxtView?.setAdapter(adapter)
-            MaterialAlertDialogBuilder(requireContext())
+            loading = MaterialAlertDialogBuilder(requireContext())
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {
@@ -335,7 +343,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             autoComTxtView?.setAdapter(adapter)
 
-            MaterialAlertDialogBuilder(requireContext())
+            loading = MaterialAlertDialogBuilder(requireContext())
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {
@@ -357,6 +365,18 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
 
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+        when(id){
+            android.R.id.home ->{
+                findNavController().navigateUp()
+                return true
+            }
+        }
+
+        return false
     }
 }
 

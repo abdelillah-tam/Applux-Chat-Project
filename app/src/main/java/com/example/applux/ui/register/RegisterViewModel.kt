@@ -19,9 +19,7 @@ class RegisterViewModel @Inject constructor(
     private val sendVerificationCode: SendVerificationCode,
     private val signInWithCredential: SignInWithCredential,
     private val checkIfContactAlreadyExist: CheckIfContactAlreadyExist,
-    private val createContactUser: CreateContactUser,
-    private val createFirstLastSeen: CreateFirstLastSeen,
-    private val createAbout: CreateAbout
+    private val createContactUser: CreateContactUser
 ) : ViewModel(){
 
     private val _state = MutableStateFlow(RegisterUiState())
@@ -75,8 +73,6 @@ class RegisterViewModel @Inject constructor(
                     _state.update {
                         it.copy(isSignedIn = true)
                     }
-                    createFirstLastSeen()
-                    createAbout()
                 }
             }
         }

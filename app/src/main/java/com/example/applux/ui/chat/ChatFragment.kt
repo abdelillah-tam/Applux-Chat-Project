@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
 import com.example.applux.databinding.FragmentChatBinding
-import com.example.applux.ui.MainFragmentDirections
+import com.example.applux.ui.main.MainFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -43,7 +43,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 state.collect{
-                    chatAdapter.setAllUsers(it.chatItemUiState!!, it.newUpdate)
+                    chatAdapter.setAllUsers(it.chatItemUiState)
                 }
             }
         }
@@ -59,10 +59,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
 
                 override fun onSingleTapUp(p0: MotionEvent): Boolean {
-                    val viewPosition = binding.chatsRecyclerview.findChildViewUnder(p0!!.x, p0!!.y)
+                    val viewPosition = binding.chatsRecyclerview.findChildViewUnder(p0.x, p0.y)
                     if (viewPosition != null) {
                         val position =
-                            binding.chatsRecyclerview.getChildAdapterPosition(viewPosition!!)
+                            binding.chatsRecyclerview.getChildAdapterPosition(viewPosition)
                         val user = chatAdapter.getChatItem(position)
                         if (user.contactUser != null && user.profileBitmap != null) {
                             val action =

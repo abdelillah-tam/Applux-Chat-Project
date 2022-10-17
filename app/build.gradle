@@ -85,14 +85,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     implementation('org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0')
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2'
 
-    implementation 'com.google.android.gms:play-services-safetynet:18.0.0'
-    implementation 'com.google.firebase:firebase-appcheck-safetynet:16.0.0-beta04'
 
     implementation 'io.michaelrocks:libphonenumber-android:8.12.36'
     implementation('androidx.paging:paging-runtime:3.1.1')

@@ -1,15 +1,16 @@
-package com.example.applux.ui
+package com.example.applux.ui.main
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
+import com.example.applux.OnlineOrOffline
 import com.example.applux.R
 import com.example.applux.ui.register.RegisterActivity
 import com.google.firebase.FirebaseApp
-import com.google.firebase.appcheck.FirebaseAppCheck
-import com.google.firebase.appcheck.safetynet.SafetyNetAppCheckProviderFactory
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -25,15 +26,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController : NavController
     private lateinit var navHost : NavHostFragment
 
-    //private val repositoryImpl: FirestoreRepositoryImpl by viewModels()
+    private val mainViewModel : MainViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         FirebaseApp.initializeApp(this)
-        val firebaseAppCheck = FirebaseAppCheck.getInstance()
-        firebaseAppCheck.installAppCheckProviderFactory(
-            SafetyNetAppCheckProviderFactory.getInstance()
-        )
 
 
         if (auth.currentUser?.uid == null){
@@ -55,14 +52,14 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp() || super.onNavigateUp()
     }
 
-   /* override fun onStart() {
+    override fun onStart() {
         super.onStart()
-        repositoryImpl.updateLastSeen(Timestamp.now().seconds.toString(), OnlineOrOffline.ONLINE)
+        mainViewModel.updateLastSeenViewModel(Timestamp.now().seconds.toString(), OnlineOrOffline.ONLINE)
     }
 
     override fun onStop() {
         super.onStop()
-        repositoryImpl.updateLastSeen(Timestamp.now().seconds.toString(), OnlineOrOffline.OFFLINE)
-    }*/
+        mainViewModel.updateLastSeenViewModel(Timestamp.now().seconds.toString(), OnlineOrOffline.OFFLINE)
+    }
 }
 

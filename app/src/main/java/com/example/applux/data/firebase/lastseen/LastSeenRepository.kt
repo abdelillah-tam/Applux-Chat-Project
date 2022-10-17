@@ -15,8 +15,6 @@ interface LastSeenRepository {
 
     suspend fun updateLastSeenPrivacy(privacy: Privacy) : Boolean
 
-    fun createFirstLastSeen(lastSeen: LastSeen)
-
 
 
 }

@@ -6,9 +6,12 @@ import com.example.applux.Privacy
 import com.example.applux.domain.models.LastSeen
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestoreException
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
+
 private const val TAG = "LastSeenRepositoryImpl"
+
 class LastSeenRepositoryImpl @Inject constructor(
     private val currentContactUserDocument: DocumentReference?,
     private val contactCollectionReference: CollectionReference
@@ -33,23 +36,31 @@ class LastSeenRepositoryImpl @Inject constructor(
     }
 
     override fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline) {
-        currentContactUserDocument?.collection("Profile")
-            ?.document("lastseen")
-            ?.update(mapOf("timestamp" to timestamp, "onlineOrOffline" to onlineOrOffline))
+        try {
+            currentContactUserDocument?.collection("Profile")
+                ?.document("lastseen")
+                ?.update(mapOf("timestamp" to timestamp, "onlineOrOffline" to onlineOrOffline))
+        }catch (exc : FirebaseFirestoreException){
+            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
+                currentContactUserDocument?.collection("Profile")
+                    ?.document("lastseen")
+                    ?.set(LastSeen(timestamp, onlineOrOffline, Privacy.PUBLIC))
+            }
+        }
     }
 
-    override suspend fun updateLastSeenPrivacy(privacy: Privacy) : Boolean{
+    override suspend fun updateLastSeenPrivacy(privacy: Privacy): Boolean {
         var result = false
         currentContactUserDocument?.collection("Profile")
             ?.document("lastseen")
             ?.update(mapOf("privacy" to privacy))
             ?.addOnCompleteListener {
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     result = true
                 }
             }
             ?.addOnFailureListener {
-                Log.e(TAG, "updateLastSeenPrivacy: ", it )
+                Log.e(TAG, "updateLastSeenPrivacy: ", it)
                 result = false
             }
             ?.await()
@@ -57,9 +68,4 @@ class LastSeenRepositoryImpl @Inject constructor(
         return result
     }
 
-    override fun createFirstLastSeen(lastSeen: LastSeen) {
-        currentContactUserDocument?.collection("Profile")
-            ?.document("lastseen")
-            ?.set(lastSeen)
-    }
 }
