@@ -56,6 +56,7 @@ class ChatsRecyclerAdapter @Inject constructor() :
         val diffCallback = diff(setOfUsers, array)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
 
+
         setOfUsers.clear()
         setOfUsers.addAll(array)
         diffResult.dispatchUpdatesTo(this)
@@ -78,7 +79,12 @@ class ChatsRecyclerAdapter @Inject constructor() :
         }
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].message!!.equals(newList[newItemPosition].message)
+
+            /*
+                return oldList[oldItemPosition].message!!.equals(newList[newItemPosition].message)
+                        && oldList[oldItemPosition].profileBitmap!!.equals(newList[newItemPosition].profileBitmap!!)*/
+            return false
+
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

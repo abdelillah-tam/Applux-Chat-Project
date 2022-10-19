@@ -11,7 +11,7 @@ interface LastSeenRepository {
 
     suspend fun getLastSeen(uid: String) : LastSeen?
 
-    fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline)
+    suspend fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline)
 
     suspend fun updateLastSeenPrivacy(privacy: Privacy) : Boolean
 

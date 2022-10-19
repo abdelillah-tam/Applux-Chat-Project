@@ -35,16 +35,18 @@ class LastSeenRepositoryImpl @Inject constructor(
         return lastSeen
     }
 
-    override fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline) {
+    override suspend fun updateLastSeen(timestamp: String, onlineOrOffline: OnlineOrOffline) {
         try {
             currentContactUserDocument?.collection("Profile")
                 ?.document("lastseen")
                 ?.update(mapOf("timestamp" to timestamp, "onlineOrOffline" to onlineOrOffline))
+                ?.await()
         }catch (exc : FirebaseFirestoreException){
             if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
                 currentContactUserDocument?.collection("Profile")
                     ?.document("lastseen")
                     ?.set(LastSeen(timestamp, onlineOrOffline, Privacy.PUBLIC))
+                    ?.await()
             }
         }
     }

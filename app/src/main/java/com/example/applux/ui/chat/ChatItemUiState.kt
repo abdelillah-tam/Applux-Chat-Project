@@ -10,5 +10,6 @@ data class ChatItemUiState(
     var picture: Picture? = null,
     var message: Message? = null,
     var contactUser: ContactUser? = null,
-    var profileBitmap: Bitmap? = null
+    var profileBitmap: Bitmap? = null,
+    var timestamp: String? = null
 )

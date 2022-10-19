@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
             navHost = supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         }
 
-        //val currentContact : ContactUser? = intent.getParcelableExtra("currentUser")
 
 
 

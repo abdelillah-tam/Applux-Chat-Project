@@ -2,6 +2,8 @@ package com.example.applux.ui.chat
 
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.applux.domain.models.Picture
@@ -11,6 +13,7 @@ import com.example.applux.domain.usecases.GetProfilePicture
 import com.example.applux.domain.usecases.GetUsersYouTalkedWith
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,8 +27,13 @@ class ChatViewModel @Inject constructor(
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ChatUiState())
-    val state: StateFlow<ChatUiState> = _state.asStateFlow()
+    /*private val _state = MutableStateFlow(ChatUiState())
+    val state: StateFlow<ChatUiState> = _state.asStateFlow()*/
+
+    private val _state = MutableLiveData<ChatUiState>()
+    val state: LiveData<ChatUiState> = _state
+    private val list = HashMap<String?, ChatItemUiState>()
+    private var firstRun = true
 
     init {
         getUsersYouTalkedWithViewModel()
@@ -35,63 +43,69 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             val listOfMessages = getUsersYouTalkedWith()
             listOfMessages.collect {
-                val list = ArrayList<ChatItemUiState>()
-                it.forEach {
-                    val chatItemUiState = ChatItemUiState()
-                    chatItemUiState.message = it
-                    var position = -1
-                    val messageStatementExpressionUid =
-                        if (it.receiverUID == auth.currentUser!!.uid) it.senderUID else it.receiverUID
-
-                    if (!messageStatementExpressionUid.equals("")) {
-                        list.also {
-                            it.add(chatItemUiState)
-                            position = it.indexOf(chatItemUiState)
-                        }
-                        getContactViewModel(messageStatementExpressionUid!!, position, chatItemUiState)
-                        getProfilePictureViewModel(messageStatementExpressionUid!!, position, chatItemUiState)
+                it.forEach { message ->
+                    val messageStatementExpressionUid: String?
+                    if (message.receiverUID == auth.currentUser!!.uid) {
+                        messageStatementExpressionUid = message.senderUID
+                    } else {
+                        messageStatementExpressionUid = message.receiverUID
                     }
-                    
+
+                    if (!messageStatementExpressionUid.equals("") && !list.containsKey(messageStatementExpressionUid)) {
+                        val chatItemUiState = ChatItemUiState()
+                        chatItemUiState.message = message
+                        chatItemUiState.timestamp = message.timestamp
+
+                        list.put(messageStatementExpressionUid, chatItemUiState)
+                        getContactViewModel(
+                            messageStatementExpressionUid!!
+                        )
+                        getProfilePictureViewModel(
+                            messageStatementExpressionUid,
+                            chatItemUiState
+                        )
+                    }else{
+                        val updatedChatItemUiState = list.get(messageStatementExpressionUid)
+                            updatedChatItemUiState!!.message = message
+                            updatedChatItemUiState.timestamp = message.timestamp
+                        list.set(messageStatementExpressionUid, updatedChatItemUiState)
+                    }
+
                 }
-                _state.update { chatuistate ->
-                    chatuistate.copy(chatItemUiState = list)
-                }
+                _state.value = ChatUiState(list)
             }
         }
     }
 
     private fun getProfilePictureViewModel(
         uid: String,
-        position: Int,
         newUpdate: ChatItemUiState
     ) {
         viewModelScope.launch {
             getProfilePicture(uid).collect { profilePicture ->
                 if (profilePicture != null) {
                     newUpdate.picture = profilePicture
-                    _state.update {
-                        val newList = it.copy().chatItemUiState
-                        newList.set(position, newUpdate)
-                        it.copy(
-                            chatItemUiState = newList,
-                            newUpdate = newUpdate
-                        )
+                    if (_state.value != null) {
+                        list.set(uid, newUpdate)
+                        _state.value = ChatUiState(list)
+                        downloadProfilePicture(uid, profilePicture, newUpdate)
                     }
-                    downloadProfilePicture(uid, profilePicture, position, newUpdate)
                 }
 
             }
         }
     }
 
-    private fun getContactViewModel(uid: String, position: Int, newUpdate: ChatItemUiState) {
+    private fun getContactViewModel(uid: String) {
         viewModelScope.launch {
             getContact(uid).collect { contactUser ->
-                newUpdate.contactUser = contactUser
-                _state.update {
-                    val newList = it.copy().chatItemUiState
-                    newList.set(position, newUpdate)
-                    it.copy(chatItemUiState = newList, newUpdate = newUpdate)
+                if (_state.value != null) {
+                    val chatItemUiState = list.get(uid)
+                    if (chatItemUiState != null) {
+                        chatItemUiState.contactUser = contactUser
+                        list.set(uid, chatItemUiState)
+                        _state.value = ChatUiState(list)
+                    }
                 }
             }
         }
@@ -100,7 +114,6 @@ class ChatViewModel @Inject constructor(
     private fun downloadProfilePicture(
         uid: String,
         profilePicture: Picture?,
-        position: Int,
         newUpdate: ChatItemUiState
     ) {
         viewModelScope.launch {
@@ -110,14 +123,14 @@ class ChatViewModel @Inject constructor(
             ).collect { byteArray ->
                 if (byteArray != null) {
                     newUpdate.profileBitmap =
-                        BitmapFactory.decodeByteArray(byteArray, 0, byteArray!!.size)
+                        BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
                 } else {
                     newUpdate.profileBitmap = null
                 }
-                _state.update {
-                    val newList = it.copy().chatItemUiState
-                    newList.set(position, newUpdate)
-                    it.copy(chatItemUiState = newList, newUpdate = newUpdate)
+                if (_state.value != null) {
+                    list.set(uid, newUpdate)
+                    _state.value = ChatUiState(list)
+                    firstRun = false
                 }
             }
         }

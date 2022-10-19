@@ -91,7 +91,6 @@ class MessageRepositoryImpl @Inject constructor(
     }
     override fun getUsersYouTalkedWith(): Flow<Set<Message>> = callbackFlow {
         var finalContactWithLastMessage = emptySet<Message>()
-        var finalContactWithLastMessage4 = emptySet<Message>()
         val streamingUsers = contactCollectionReference.document(auth.currentUser!!.uid)
             .collection("sharedChat").orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
@@ -99,7 +98,12 @@ class MessageRepositoryImpl @Inject constructor(
                     return@addSnapshotListener
                 }
                 if (value != null) {
-                    finalContactWithLastMessage+=value.toObjects(Message::class.java)
+
+                    //finalContactWithLastMessage+=value.toObjects(Message::class.java)
+                    //finalContactWithLastMessage+=value.documentChanges[0].document.toObject(Message::class.java)
+                    value.documentChanges.forEach {
+                        finalContactWithLastMessage+=it.document.toObject(Message::class.java)
+                    }
                     /*value.documentChanges.forEach {
                         Log.e(TAG, "getUsersYouTalkedWith: " + it.document.toObject(Message::class.java).text )
                     }*/

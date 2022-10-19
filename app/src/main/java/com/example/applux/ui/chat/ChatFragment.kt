@@ -18,6 +18,8 @@ import com.example.applux.databinding.FragmentChatBinding
 import com.example.applux.ui.main.MainFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -38,12 +40,17 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         binding.chatsRecyclerview.apply {
             adapter = chatAdapter
             layoutManager = LinearLayoutManager(context)
+            animation = null
+            itemAnimator = null
+            stateListAnimator = null
         }
         val state = chatViewModel.state
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                state.collect{
-                    chatAdapter.setAllUsers(it.chatItemUiState)
+                state.observe(viewLifecycleOwner){
+                    chatAdapter.setAllUsers(ArrayList(it.chatItemUiState.values.sortedByDescending{
+                        it.timestamp
+                    }))
                 }
             }
         }
