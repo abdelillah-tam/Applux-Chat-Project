@@ -16,12 +16,14 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.example.applux.OnlineOrOffline
 import com.example.applux.R
 import com.example.applux.ui.chat.ChatFragment
 import com.example.applux.databinding.FragmentMainBinding
 import com.example.applux.ui.register.RegisterActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,9 +36,9 @@ class MainFragment : Fragment(R.layout.fragment_main),
 
     private lateinit var binding: FragmentMainBinding
 
-
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    private val mainViewModel : MainViewModel by viewModels()
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentMainBinding.bind(view)
@@ -127,6 +129,7 @@ class MainFragment : Fragment(R.layout.fragment_main),
 
             R.id.nav_logout ->{
                 if (Firebase.auth.currentUser != null){
+                    mainViewModel.updateLastSeenViewModel(Timestamp.now().toString(), OnlineOrOffline.OFFLINE)
                     Firebase.auth.signOut()
                     val intent = Intent(requireContext(), RegisterActivity::class.java)
                     startActivity(intent)

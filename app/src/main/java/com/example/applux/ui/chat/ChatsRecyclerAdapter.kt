@@ -6,7 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.applux.OnlineOrOffline
 import com.example.applux.R
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import dagger.hilt.android.scopes.FragmentScoped
@@ -22,6 +24,7 @@ class ChatsRecyclerAdapter @Inject constructor() :
         val contactImage = itemView.findViewById(R.id.contactImage) as ShapeableImageView
         val contactName = itemView.findViewById(R.id.contactName) as MaterialTextView
         val contactLastMsg = itemView.findViewById(R.id.contactLastMessage) as MaterialTextView
+        val isOnline = itemView.findViewById(R.id.is_online) as MaterialCheckBox
     }
 
 
@@ -45,6 +48,9 @@ class ChatsRecyclerAdapter @Inject constructor() :
             holder.contactName.text = chatItemUiState.contactUser!!.name
         }
 
+        if (chatItemUiState.lastSeen != null){
+            holder.isOnline.isChecked = chatItemUiState.lastSeen!!.onlineOrOffline!!.equals(OnlineOrOffline.ONLINE)
+        }
     }
 
     override fun getItemCount(): Int {

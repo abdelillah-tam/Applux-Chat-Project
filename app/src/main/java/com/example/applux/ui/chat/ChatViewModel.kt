@@ -7,10 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.applux.domain.models.Picture
-import com.example.applux.domain.usecases.DownloadProfilePicture
-import com.example.applux.domain.usecases.GetContact
-import com.example.applux.domain.usecases.GetProfilePicture
-import com.example.applux.domain.usecases.GetUsersYouTalkedWith
+import com.example.applux.domain.usecases.*
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -24,11 +21,10 @@ class ChatViewModel @Inject constructor(
     private val getContact: GetContact,
     private val getProfilePicture: GetProfilePicture,
     private val downloadProfilePicture: DownloadProfilePicture,
+    private val userState: UserState,
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
-    /*private val _state = MutableStateFlow(ChatUiState())
-    val state: StateFlow<ChatUiState> = _state.asStateFlow()*/
 
     private val _state = MutableLiveData<ChatUiState>()
     val state: LiveData<ChatUiState> = _state
@@ -60,6 +56,7 @@ class ChatViewModel @Inject constructor(
                         getContactViewModel(
                             messageStatementExpressionUid!!
                         )
+                        userStateViewModel(messageStatementExpressionUid)
                         getProfilePictureViewModel(
                             messageStatementExpressionUid,
                             chatItemUiState
@@ -136,4 +133,16 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun userStateViewModel(uid: String){
+        viewModelScope.launch {
+            userState(uid).collect{
+                if (it != null && list.containsKey(uid)){
+                    val chatItemUiState = list.get(uid)
+                    chatItemUiState!!.lastSeen = it
+                    list.set(uid, chatItemUiState)
+                    _state.value = ChatUiState(list)
+                }
+            }
+        }
+    }
 }

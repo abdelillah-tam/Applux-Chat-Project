@@ -4,10 +4,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
 import com.example.applux.domain.models.Message
+import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.scopes.FragmentScoped
 import java.text.DateFormat
@@ -15,8 +16,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
-import kotlin.collections.HashSet
-import kotlin.collections.LinkedHashSet
 
 @FragmentScoped
 class ChatchannelAdapter @Inject constructor() :
@@ -27,7 +26,10 @@ class ChatchannelAdapter @Inject constructor() :
     private val SENDER = 1
     private val RECEIVER = 2
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+        val msgText = itemView.findViewById(R.id.message_text) as MaterialTextView
+        val date = itemView.findViewById(R.id.msg_date) as MaterialTextView
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         if (viewType == SENDER) {
@@ -42,13 +44,11 @@ class ChatchannelAdapter @Inject constructor() :
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val msgText = holder.itemView.findViewById(R.id.message_text) as TextView
-        val date = holder.itemView.findViewById(R.id.msg_date) as TextView
         val message = array.get(position)
 
-        msgText.text = message.text
+        holder.msgText.text = message.text
         val dateString = timestampToDate(message.timestamp!!)
-        date.text = dateString
+        holder.date.text = dateString
     }
 
 
@@ -57,14 +57,13 @@ class ChatchannelAdapter @Inject constructor() :
         notifyDataSetChanged()
     }
 
-    fun addMessages(message: Set<Message>) {
-        array = ArrayList(message.toSet())
-        array.reverse()
-        array.sortBy {
-            it.timestamp
-        }
+    fun addMessages(messages: ArrayList<Message>) {
+        val diff = Diff(this.array, messages)
+        val diffResult = DiffUtil.calculateDiff(diff)
 
-        notifyDataSetChanged()
+        array.clear()
+        array.addAll(messages)
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun getItemCount(): Int {
@@ -73,7 +72,7 @@ class ChatchannelAdapter @Inject constructor() :
 
     override fun getItemViewType(position: Int): Int {
         val message = array.elementAt(position)
-        if (message!!.senderUID == auth.currentUser!!.uid) {
+        if (message.senderUID == auth.currentUser!!.uid) {
             return SENDER
         } else {
             return RECEIVER
@@ -85,5 +84,26 @@ class ChatchannelAdapter @Inject constructor() :
         date.timeZone = TimeZone.getDefault()
         val secondDate = Date(timestamp.toLong() * 1000L)
         return date.format(secondDate)
+    }
+
+    class Diff(val oldList: ArrayList<Message>,
+        val newList : ArrayList<Message>
+               ) : DiffUtil.Callback(){
+        override fun getOldListSize(): Int {
+            return oldList.size
+        }
+
+        override fun getNewListSize(): Int {
+            return newList.size
+        }
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].messageId.equals(newList[newItemPosition].messageId)
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].equals(newList[newItemPosition])
+        }
+
     }
 }

@@ -75,7 +75,8 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                             val action =
                                 MainFragmentDirections.actionMainFragmentToChatchannelFragment(
                                     user.contactUser!!,
-                                    user.profileBitmap!!
+                                    user.profileBitmap!!,
+                                    user.lastSeen
                                 )
                             findNavController().navigate(action)
                         }

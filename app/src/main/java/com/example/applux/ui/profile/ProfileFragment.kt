@@ -31,9 +31,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         setHasOptionsMenu(true)
 
         val contact = contactArg.contactUser
-        val about = contactArg.about
+        //val about = contactArg.about
         binding.profilenameTextview.text = contact.name
-        binding.profileAbout.text = about!!.about
+        //binding.profileAbout.text = about!!.about
         binding.profilePhoneNumber.text = contact.phone
 
     }

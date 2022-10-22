@@ -10,11 +10,12 @@ import com.google.firebase.firestore.DocumentSnapshot
 data class ChatChannelUiState(
     val profilePictureBitmap: Bitmap? = null,
     val contactUser: ContactUser? = null,
-    val messages : Set<Message> = emptySet(),
+    val messages : HashMap<String, Message> = HashMap(),
     val about: About? = null,
     val lastSeen: LastSeen? = null,
     val isSent: Boolean = false,
     val firstTime: Boolean = true,
     val position: Message? = null,
-    val newMessage: Message? = null
+    val newMessage: Message? = null,
+    var disableLoading: Boolean = false
 )

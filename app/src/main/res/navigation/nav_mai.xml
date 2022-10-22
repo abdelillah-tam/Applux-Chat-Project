@@ -50,6 +50,10 @@
             android:name="profileBitmap"
             app:argType="android.graphics.Bitmap"
             app:nullable="true" />
+        <argument
+            android:name="lastseen"
+            app:argType="com.example.applux.domain.models.LastSeen"
+            app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -58,9 +62,6 @@
         <argument
             android:name="contactUser"
             app:argType="com.example.applux.domain.models.ContactUser" />
-        <argument
-            android:name="about"
-            app:argType="com.example.applux.domain.models.About" />
         <action
             android:id="@+id/action_profileFragment_to_mainFragment"
             app:destination="@id/mainFragment" />

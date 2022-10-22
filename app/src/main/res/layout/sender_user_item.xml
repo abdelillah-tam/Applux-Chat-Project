@@ -18,14 +18,24 @@
         android:scaleType="centerCrop"
         tools:src="@drawable/markzucker" />
 
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:button="@null"
+        android:background="@drawable/onlineoroffline"
+        android:clickable="false"
+        android:id="@+id/is_online"
+        app:layout_constraintBottom_toBottomOf="@+id/contactImage"
+        app:layout_constraintEnd_toEndOf="@+id/contactImage" />
+
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/contactName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/tajawal_extrabold"
         android:textColor="@color/black"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:textDirection="ltr"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +47,7 @@
         android:id="@+id/contactLastMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:fontFamily="@font/tajawal_regular"
         android:textColor="@color/grey_500"
         android:textSize="16sp"

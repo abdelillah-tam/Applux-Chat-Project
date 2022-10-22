@@ -72,7 +72,7 @@ class MessageRepositoryImpl @Inject constructor(
         val messages = contactCollectionReference.document(auth.currentUser!!.uid)
             .collection("sharedChat").document(receiverUid).collection("messages")
 
-        var gotMsgs: QuerySnapshot? = null
+        var gotMsgs: QuerySnapshot?
         if (firstTime) {
             gotMsgs =
                 messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
@@ -84,7 +84,6 @@ class MessageRepositoryImpl @Inject constructor(
                     .startAfter(position?.timestamp)
                     .get().await()
         }
-
         if (gotMsgs != null && gotMsgs.size() != 0) {
             emit(gotMsgs)
         }
@@ -98,15 +97,9 @@ class MessageRepositoryImpl @Inject constructor(
                     return@addSnapshotListener
                 }
                 if (value != null) {
-
-                    //finalContactWithLastMessage+=value.toObjects(Message::class.java)
-                    //finalContactWithLastMessage+=value.documentChanges[0].document.toObject(Message::class.java)
                     value.documentChanges.forEach {
                         finalContactWithLastMessage+=it.document.toObject(Message::class.java)
                     }
-                    /*value.documentChanges.forEach {
-                        Log.e(TAG, "getUsersYouTalkedWith: " + it.document.toObject(Message::class.java).text )
-                    }*/
                     try {
                         trySend(finalContactWithLastMessage)
                         finalContactWithLastMessage = emptySet()

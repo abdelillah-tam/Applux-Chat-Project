@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
 import com.example.applux.databinding.FragmentContactsBinding
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import dagger.hilt.android.AndroidEntryPoint
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import kotlinx.coroutines.flow.collect
@@ -79,7 +80,7 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
                     val contactUser = curListAdap.getContact(position)
                     val action =
                         ContactsFragmentDirections.actionContactsFragmentToChatchannelFragment(
-                            contactUser.contactUser, null
+                            contactUser.contactUser, null, null
                         )
                     findNavController().navigate(action)
                 }
@@ -140,6 +141,7 @@ class ContactsFragment : Fragment(R.layout.fragment_contacts) {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 contactsViewModel.state.collect {
                     curListAdap.setContactsFromFirebase(it.contactsItemUiState)
+                    binding.progressContacts.visibility = CircularProgressIndicator.GONE
                 }
             }
         }

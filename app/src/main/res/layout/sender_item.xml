@@ -14,7 +14,7 @@
         android:layout_marginVertical="4dp"
         android:background="@drawable/back_sender">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/message_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             tools:text="مرحبا مرحبا مرحبا مرحبا مرحبا مرح مرحبابا مرحبا مرحبا"
             android:textSize="16sp" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/msg_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -2,7 +2,10 @@ package com.example.applux.domain.usecases
 
 import com.example.applux.data.firebase.message.MessageRepository
 import com.example.applux.domain.models.Message
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
@@ -20,7 +23,7 @@ class GetAllMessages @Inject constructor(
     ): Flow<QuerySnapshot?> = flow {
 
         messageRepository.getAllMessages(receiverUid, firstTime, position).collect {
-            //Log.e("TAG", "invoke: " + position?.toObject(Message::class.java)?.text )
+
             emit(it)
         }
 
