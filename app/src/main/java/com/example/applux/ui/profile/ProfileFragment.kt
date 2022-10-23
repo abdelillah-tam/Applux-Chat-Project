@@ -1,10 +1,16 @@
 package com.example.applux.ui.profile
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -12,6 +18,8 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.applux.R
 import com.example.applux.databinding.FragmentProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -20,6 +28,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val contactArg : ProfileFragmentArgs by navArgs()
 
+    private val profileViewModel : ProfileViewModel by viewModels()
+
+    @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding = FragmentProfileBinding.bind(view)
         binding.toolbarOfProfilefrag.title = ""
@@ -31,10 +42,30 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         setHasOptionsMenu(true)
 
         val contact = contactArg.contactUser
-        //val about = contactArg.about
-        binding.profilenameTextview.text = contact.name
-        //binding.profileAbout.text = about!!.about
-        binding.profilePhoneNumber.text = contact.phone
+        val profileBitmap = contactArg.profileBitmap
+
+        profileViewModel.setContactUserViewModel(contact)
+        profileViewModel.setProfileBitmapViewModel(profileBitmap)
+        profileViewModel.getAboutViewModel(contact.uid!!)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                profileViewModel.state.collect{
+                    binding.profilenameTextview.text = it.contactUser!!.name
+                    binding.profilePhoneNumber.text = it.contactUser.phone
+
+                    if (it.profileBitmap != null){
+                        binding.profilePic.setImageBitmap(it.profileBitmap)
+                    }else{
+                        binding.profilePic.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_face, null))
+                    }
+
+                    if (it.about != null){
+                        binding.profileAbout.text = it.about.about
+                    }
+                }
+            }
+        }
 
     }
 

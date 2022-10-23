@@ -10,18 +10,24 @@
         android:layout_height="wrap_content"
         android:id="@+id/edit_privacies"
         app:expandedHintEnabled="false"
-        android:textColorHint="@color/purple_700"
+        app:hintEnabled="false"
         android:layout_margin="16dp"
-        android:focusedByDefault="true"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusBottomEnd="16dp"
+        app:boxStrokeWidth="0.5dp"
+        app:boxStrokeColor="@color/orange_500"
+        app:boxStrokeWidthFocused="0.5dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:inputType="none"
             tools:text="Hello"
-            android:textColor="@color/purple_200"
+            android:textColor="@color/black"
             />
 
     </com.google.android.material.textfield.TextInputLayout>

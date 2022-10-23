@@ -207,10 +207,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.settingsClickUsername.setOnClickListener{
             val valueBinding = EditValuesBinding.inflate(layoutInflater)
-            valueBinding.editValues.hint = "Edit your username"
             valueBinding.editValues.editText?.text =
                 Editable.Factory.getInstance().newEditable(currentContact.name)
             loading = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Edit your username")
                 .setView(valueBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     settingsViewModel.onEvent(SettingsEvent.UpdateUsername(valueBinding.editValues.editText?.text.toString()))
@@ -223,12 +223,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
         binding.settingsClickAbout.setOnClickListener{
             val valueBinding = EditValuesBinding.inflate(layoutInflater)
-            valueBinding.editValues.hint = "Edit your about"
             if (state.value.about != null) {
                 valueBinding.editValues.editText?.text =
                     Editable.Factory.getInstance().newEditable(state.value.about!!.about)
             }
             loading = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Edit your about")
                 .setView(valueBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     settingsViewModel.onEvent(SettingsEvent.UpdateAbout(valueBinding.editValues.editText?.text.toString()))
@@ -262,6 +262,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             autoComTxtView?.setAdapter(adapter)
             loading = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Change the privacy of your last seen")
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {
@@ -301,6 +302,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
             autoComTxtView?.setAdapter(adapter)
             loading = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Change the privacy of your profile photo")
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {
@@ -344,6 +346,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             autoComTxtView?.setAdapter(adapter)
 
             loading = MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Change the privacy of your about")
                 .setView(privacyBinding.root)
                 .setPositiveButton("Save") { _, _ ->
                     when (autoComTxtView?.text.toString()) {

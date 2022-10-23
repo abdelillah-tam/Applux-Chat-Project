@@ -20,6 +20,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.OnlineOrOffline
+import com.example.applux.Privacy
 import com.example.applux.R
 import com.example.applux.databinding.FragmentChatchannelBinding
 import com.example.applux.domain.models.About
@@ -32,8 +33,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.UUID
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
@@ -79,7 +83,18 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
                         binding.userState.setTextColor(ResourcesCompat.getColor(resources, R.color.green_600, null))
                         binding.userState.text = "Online"
                     }else{
-                        binding.userState.visibility = MaterialTextView.GONE
+                        if (it.lastSeen != null && it.lastSeen.privacy.equals(Privacy.NONOE)){
+                            binding.userState.visibility = MaterialTextView.GONE
+                        }else {
+                            binding.userState.setTextColor(
+                                ResourcesCompat.getColor(
+                                    resources,
+                                    R.color.grey_500,
+                                    null
+                                )
+                            )
+                            binding.userState.text = timestampToDate(it.lastSeen?.timestamp)
+                        }
                     }
                     if (it.messages.isNotEmpty()) {
                         chatchannelAdapter.addMessages(ArrayList(it.messages.values.sortedBy {
@@ -115,7 +130,7 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
 
         binding.toolbarOfChatchannelfrag.setOnClickListener {
             val action =
-                ChatchannelFragmentDirections.actionChatchannelFragmentToProfileFragment(contact)
+                ChatchannelFragmentDirections.actionChatchannelFragmentToProfileFragment(contact, profileBitmap)
             findNavController().navigate(action)
         }
 
@@ -135,8 +150,8 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
             }
         })
         binding.sendButton.setOnClickListener {
-            val text = binding.messageTextEdittext.text.toString()
-            binding.messageTextEdittext.text.clear()
+            val text = binding.messageTextEdittext.editText?.text.toString()
+            binding.messageTextEdittext.editText?.text?.clear()
             val message = Message(
                 UUID.randomUUID().toString(),
                 Timestamp.now().seconds.toString(),
@@ -164,5 +179,14 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
         }
     }
 
+    private fun timestampToDate(timestamp: String?): String {
+        val date: DateFormat = SimpleDateFormat("hh:mm a")
+        date.timeZone = TimeZone.getDefault()
+        if (timestamp != null) {
+            val secondDate = Date(timestamp.toLong() * 1000L)
+            return date.format(secondDate)
+        }
+        return ""
+    }
 
 }

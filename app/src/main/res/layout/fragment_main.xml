@@ -67,13 +67,13 @@
             android:layout_height="64dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="48dp"
-            app:backgroundTint="@color/orange_100"
+            app:backgroundTint="@color/orange_500"
             app:fabCustomSize="64dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:maxImageSize="28dp"
             app:srcCompat="@drawable/ic_message"
-            app:tint="@color/orange_500" />
+            app:tint="@color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

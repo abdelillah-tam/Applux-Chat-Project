@@ -9,16 +9,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edit_values"
-        app:expandedHintEnabled="false"
-        android:textColorHint="@color/purple_700"
-        android:layout_margin="16dp"
-        android:focusedByDefault="true"
+        android:textColorHint="@color/black"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:hintEnabled="false"
+        app:boxStrokeColor="@color/orange_500"
+        app:boxStrokeWidthFocused="0.5dp"
+        app:boxCornerRadiusBottomEnd="16dp"
+        app:boxCornerRadiusBottomStart="16dp"
+        app:boxCornerRadiusTopEnd="16dp"
+        app:boxCornerRadiusTopStart="16dp"
+        app:boxStrokeWidth="0.5dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:textCursorDrawable="@null"
+            android:textColor="@color/black"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
