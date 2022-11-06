@@ -22,17 +22,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.OnlineOrOffline
 import com.example.applux.Privacy
 import com.example.applux.R
+import com.example.applux.data.TimeByZoneClient
+import com.example.applux.data.WorldTimeModel
 import com.example.applux.databinding.FragmentChatchannelBinding
-import com.example.applux.domain.models.About
 import com.example.applux.domain.models.ContactUser
 import com.example.applux.domain.models.Message
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -152,17 +156,35 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
         binding.sendButton.setOnClickListener {
             val text = binding.messageTextEdittext.editText?.text.toString()
             binding.messageTextEdittext.editText?.text?.clear()
-            val message = Message(
-                UUID.randomUUID().toString(),
-                Timestamp.now().seconds.toString(),
-                text,
-                auth.currentUser!!.phoneNumber,
-                auth.currentUser!!.uid,
-                contact.phone,
-                contact.uid
-            )
+            TimeByZoneClient.getTime(DateTimeZone.getDefault().id)
+                .enqueue(object : Callback<WorldTimeModel>{
+                    override fun onResponse(
+                        call: Call<WorldTimeModel>,
+                        response: Response<WorldTimeModel>
+                    ) {
+                        val time = response.body()!!
+                        val timestamp = DateTime.parse(time.dateTime).millis / 1000L
+                        val message = Message(
+                            UUID.randomUUID().toString(),
+                            timestamp.toString(),
+                            text,
+                            auth.currentUser!!.phoneNumber,
+                            auth.currentUser!!.uid,
+                            contact.phone,
+                            contact.uid
+                        )
+                        chatChannelViewModel.sendMessageViewModel(message)
+                    }
 
-            chatChannelViewModel.sendMessageViewModel(message)
+                    override fun onFailure(call: Call<WorldTimeModel>, t: Throwable) {
+
+                    }
+
+
+                })
+
+
+
 
         }
 

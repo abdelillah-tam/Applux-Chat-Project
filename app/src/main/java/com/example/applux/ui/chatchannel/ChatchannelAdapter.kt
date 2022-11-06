@@ -7,10 +7,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
+import com.example.applux.data.TimeByZoneClient
+import com.example.applux.data.WorldTimeModel
 import com.example.applux.domain.models.Message
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.scopes.FragmentScoped
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
+import org.joda.time.LocalDate
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,9 +34,34 @@ class ChatchannelAdapter @Inject constructor() :
     private val SENDER = 1
     private val RECEIVER = 2
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    private var lastDateValue: String = ""
+
+    private var startDayOfToday : Long = 0L
+    private var startDayOfYesterday : Long = 0L
+
+    private val time : Call<WorldTimeModel> = TimeByZoneClient.getTime(DateTimeZone.getDefault().id)
+
+    init {
+        time.enqueue(object : Callback<WorldTimeModel>{
+            override fun onResponse(
+                call: Call<WorldTimeModel>,
+                response: Response<WorldTimeModel>
+            ) {
+                val byZone = response.body()!!
+                startDayOfToday = DateTime.parse(byZone.dateTime).withTimeAtStartOfDay().millis / 1000L
+                startDayOfYesterday = DateTime.parse(byZone.dateTime).minusDays(1).withTimeAtStartOfDay().millis / 1000L
+            }
+
+            override fun onFailure(call: Call<WorldTimeModel>, t: Throwable) {
+            }
+
+        })
+    }
+
+    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val date = itemView.findViewById(R.id.date) as MaterialTextView
         val msgText = itemView.findViewById(R.id.message_text) as MaterialTextView
-        val date = itemView.findViewById(R.id.msg_date) as MaterialTextView
+        val msgDate = itemView.findViewById(R.id.msg_date) as MaterialTextView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
@@ -46,16 +79,22 @@ class ChatchannelAdapter @Inject constructor() :
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = array.get(position)
 
+        val result = calculateDate(message.timestamp!!.toLong())
+
+        if (lastDateValue.equals(result)) {
+            holder.date.visibility = MaterialTextView.GONE
+        } else {
+            holder.date.text = result
+            holder.date.visibility = MaterialTextView.VISIBLE
+            lastDateValue = result
+        }
+
         holder.msgText.text = message.text
-        val dateString = timestampToDate(message.timestamp!!)
-        holder.date.text = dateString
+        val dateString = timestampToHoursAndMinutes(message.timestamp!!)
+        holder.msgDate.text = dateString
+
     }
 
-
-    fun addMessage(message: Message) {
-
-        notifyDataSetChanged()
-    }
 
     fun addMessages(messages: ArrayList<Message>) {
         val diff = Diff(this.array, messages)
@@ -79,16 +118,50 @@ class ChatchannelAdapter @Inject constructor() :
         }
     }
 
-    private fun timestampToDate(timestamp: String): String {
-        val date: DateFormat = SimpleDateFormat("hh:mm a dd/MM/yy")
+
+    private fun timestampToHoursAndMinutes(timestamp: String): String {
+        val date: DateFormat = SimpleDateFormat("hh:mm a")
         date.timeZone = TimeZone.getDefault()
         val secondDate = Date(timestamp.toLong() * 1000L)
         return date.format(secondDate)
     }
 
-    class Diff(val oldList: ArrayList<Message>,
-        val newList : ArrayList<Message>
-               ) : DiffUtil.Callback(){
+    private fun timestampToDaysAndMonth(timestamp: Long): String {
+        val date: DateFormat = SimpleDateFormat("dd MMMM")
+        date.timeZone = TimeZone.getDefault()
+        val secondDate = Date(timestamp * 1000L)
+        return date.format(secondDate)
+    }
+
+    private fun timestampToDaysAndMonthAndYears(timestamp: Long): String {
+        val date: DateFormat = SimpleDateFormat("dd MMMM yyyy")
+        date.timeZone = TimeZone.getDefault()
+        val secondDate = Date(timestamp * 1000L)
+        return date.format(secondDate)
+    }
+
+    private fun calculateDate(timestamp: Long): String {
+        val oneDayInSeconds = 24 * 60 * 60
+        val oneYearInSeconds = (oneDayInSeconds * 365)
+        val currentTime = System.currentTimeMillis() / 1000L
+
+
+        if (timestamp < startDayOfToday && timestamp >= startDayOfYesterday
+        ) {
+            return "Yesterday"
+        } else if (timestamp < startDayOfYesterday) {
+            return timestampToDaysAndMonth(timestamp)
+        } else if (currentTime >= (timestamp + oneYearInSeconds)) {
+            return timestampToDaysAndMonthAndYears(timestamp)
+        } else {
+            return "Today"
+        }
+    }
+
+    class Diff(
+        val oldList: ArrayList<Message>,
+        val newList: ArrayList<Message>
+    ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int {
             return oldList.size
         }

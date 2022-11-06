@@ -1,9 +1,12 @@
 package com.example.applux.ui.chat
 
+import android.content.res.Resources
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.OnlineOrOffline
@@ -19,6 +22,8 @@ class ChatsRecyclerAdapter @Inject constructor() :
     RecyclerView.Adapter<ChatsRecyclerAdapter.ChatViewHolder>() {
 
     private var setOfUsers = ArrayList<ChatItemUiState>()
+
+    private var resources : Resources? = null
 
     class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val contactImage = itemView.findViewById(R.id.contactImage) as ShapeableImageView
@@ -38,7 +43,7 @@ class ChatsRecyclerAdapter @Inject constructor() :
 
         val chatItemUiState = setOfUsers.elementAt(position)
 
-        if (chatItemUiState.profileBitmap != null) {
+        if (chatItemUiState.profileBitmap != null){
             holder.contactImage.setImageBitmap(chatItemUiState.profileBitmap)
         }
         if (chatItemUiState.message != null) {
@@ -97,5 +102,10 @@ class ChatsRecyclerAdapter @Inject constructor() :
             return oldList[oldItemPosition].equals(newList[newItemPosition])
         }
 
+    }
+
+    fun setResources(resources: Resources)
+    {
+        this.resources = resources
     }
 }

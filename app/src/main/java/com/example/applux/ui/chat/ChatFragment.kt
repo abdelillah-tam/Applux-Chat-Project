@@ -14,14 +14,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
+import com.example.applux.data.TimeByZoneClient
+import com.example.applux.data.WorldTimeModel
 import com.example.applux.databinding.FragmentChatBinding
 import com.example.applux.ui.main.MainFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.joda.time.DateTimeZone
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(R.layout.fragment_chat) {
@@ -37,6 +41,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentChatBinding.bind(view)
+
         binding.chatsRecyclerview.apply {
             adapter = chatAdapter
             layoutManager = LinearLayoutManager(context)
@@ -44,7 +49,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             itemAnimator = null
             stateListAnimator = null
         }
+        chatAdapter.setResources(resources)
         val state = chatViewModel.state
+
+        val zone = DateTimeZone.getDefault()
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 state.observe(viewLifecycleOwner){
@@ -52,6 +61,10 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         it.timestamp
                     }))
                 }
+
+                //chatAdapter.setAllUsers(array)
+
+
             }
         }
 
@@ -71,6 +84,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         val position =
                             binding.chatsRecyclerview.getChildAdapterPosition(viewPosition)
                         val user = chatAdapter.getChatItem(position)
+
                         if (user.contactUser != null && user.profileBitmap != null) {
                             val action =
                                 MainFragmentDirections.actionMainFragmentToChatchannelFragment(

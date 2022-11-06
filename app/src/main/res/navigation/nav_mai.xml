@@ -14,7 +14,8 @@
             app:destination="@id/settingsFragment" />
         <action
             android:id="@+id/action_mainFragment_to_contactsFragment"
-            app:destination="@id/contactsFragment" />
+            app:destination="@id/contactsFragment"
+            app:enterAnim="@anim/nav_default_pop_enter_anim" />
         <action
             android:id="@+id/action_mainFragment_to_chatchannelFragment"
             app:destination="@id/chatchannelFragment" />
