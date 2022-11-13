@@ -32,7 +32,7 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val contact = contactsUsers.get(position)
         val getName = contact.contactUser?.name
-        val getNumber = contact.contactUser?.phone
+        val getNumber = contact.contactUser?.phoneOrEmail
 
 
         holder.nameTextView.text = getName

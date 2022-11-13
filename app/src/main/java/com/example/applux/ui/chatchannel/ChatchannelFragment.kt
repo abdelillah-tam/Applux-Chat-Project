@@ -170,7 +170,7 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
                             text,
                             auth.currentUser!!.phoneNumber,
                             auth.currentUser!!.uid,
-                            contact.phone,
+                            contact.phoneOrEmail,
                             contact.uid
                         )
                         chatChannelViewModel.sendMessageViewModel(message)

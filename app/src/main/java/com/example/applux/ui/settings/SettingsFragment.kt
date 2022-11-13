@@ -135,7 +135,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                     if (it.contactUser != null) {
                         currentContact = state.value.contactUser!!
                         binding.coll.title = state.value.contactUser!!.name
-                        binding.settingsPhonenumber.text = state.value.contactUser!!.phone
+                        binding.settingsPhonenumber.text = state.value.contactUser!!.phoneOrEmail
                         binding.settingsUsername.text = state.value.contactUser!!.name
                     }
 

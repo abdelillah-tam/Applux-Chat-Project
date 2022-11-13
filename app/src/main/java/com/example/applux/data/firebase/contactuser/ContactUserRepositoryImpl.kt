@@ -3,9 +3,7 @@ package com.example.applux.data.firebase.contactuser
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.example.applux.domain.models.ContactUser
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -29,8 +27,10 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun createContactUser(contactUser: ContactUser): Boolean {
         var result = false
-        contactCollectionReference.document(auth.currentUser!!.uid).set(contactUser)
+        contactCollectionReference.document(auth.currentUser!!.uid)
+            .set(contactUser)
             .addOnCompleteListener {
+                Log.e(TAG, "createContactUser: called" )
                 if (it.isSuccessful) {
                     result = true
                 }
@@ -51,7 +51,7 @@ class ContactUserRepositoryImpl @Inject constructor(
         val chuncked = contactsvalues.chunked(10)
 
         chuncked.forEach {
-            val p = contactCollectionReference.whereIn("phone", it).get().await()
+            val p = contactCollectionReference.whereIn("phoneOrEmail", it).get().await()
             p.documents.forEach {
                 val contact = it.toObject(ContactUser::class.java)
                 if (contact != null && !contact.uid.equals(auth.currentUser!!.uid)) {
@@ -79,12 +79,10 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun checkIfContactAlreadyExist(phone: String) : Boolean {
         var result  = false
-        contactCollectionReference.whereIn("phone", arrayListOf(phone))
+        contactCollectionReference.whereIn("phoneOrEmail", arrayListOf(phone))
             .get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    result = true
-                }
+            .addOnSuccessListener {
+                result = it.toObjects(ContactUser::class.java).isNotEmpty()
             }
             .addOnFailureListener {
                 result = false
@@ -141,7 +139,7 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun signInWithCredential(
+    override suspend fun signInWithPhoneCredential(
         credential: PhoneAuthCredential
     ): Boolean {
         var result = false
@@ -160,5 +158,20 @@ class ContactUserRepositoryImpl @Inject constructor(
         return result
     }
 
+    override suspend fun signInWithFacebookCredential(
+        credential: AuthCredential
+    ) : Boolean{
+        var result = false
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener {
+                if (it.isSuccessful){
+                    result = true
+                }
+            }
+            .addOnFailureListener { result = false }
+            .await()
+
+        return result
+    }
 
 }

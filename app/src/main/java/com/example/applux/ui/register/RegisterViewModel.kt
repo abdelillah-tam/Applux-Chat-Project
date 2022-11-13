@@ -5,9 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.applux.domain.models.ContactUser
 import com.example.applux.domain.usecases.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -17,7 +15,8 @@ import javax.inject.Inject
 class RegisterViewModel @Inject constructor(
     private val auth: FirebaseAuth,
     private val sendVerificationCode: SendVerificationCode,
-    private val signInWithCredential: SignInWithCredential,
+    private val signInWithPhoneCredential: SignInWithPhoneCredential,
+    private val signInWithFacebookCredential: SignInWithFacebookCredential,
     private val checkIfContactAlreadyExist: CheckIfContactAlreadyExist,
     private val createContactUser: CreateContactUser
 ) : ViewModel(){
@@ -40,9 +39,9 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun signInWithCredentialViewModel(p0: PhoneAuthCredential, phone: String){
+    fun signInWithPhoneCredentialViewModel(p0: PhoneAuthCredential, phone: String){
         viewModelScope.launch {
-            signInWithCredential(p0).collect { result ->
+            signInWithPhoneCredential(p0).collect { result ->
                 if (result){
                     checkIfContactAlreadyExist(phone).collect { exist ->
                         if (exist){
@@ -50,9 +49,6 @@ class RegisterViewModel @Inject constructor(
                                 it.copy(isExist = exist)
                             }
                         }else{
-                            _state.update {
-                                it.copy(isExist = exist)
-                            }
                             createCompleteAccountViewModel(phone)
                         }
                     }
@@ -62,10 +58,10 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun createCompleteAccountViewModel(phone: String){
+    private fun createCompleteAccountViewModel(phoneOrEmail: String){
         viewModelScope.launch {
             val contactUser = ContactUser(auth.currentUser!!.uid,
-                phone,
+                phoneOrEmail,
                 ""
                 )
             createContactUser(contactUser).collect {
@@ -78,6 +74,24 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    fun signInWithFacebookCredentialViewModel(p0: AuthCredential){
+        viewModelScope.launch {
+            signInWithFacebookCredential(p0).collect{ result ->
+                if (result){
+                    checkIfContactAlreadyExist(auth.currentUser!!.email!!).collect{ exist ->
+                        if (exist){
+                            _state.update {
+                                it.copy(isExist = exist)
+                            }
+                        }else{
+                            createCompleteAccountViewModel(auth.currentUser!!.email!!)
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 
     fun savePhone(phone: String){
         _state.update {

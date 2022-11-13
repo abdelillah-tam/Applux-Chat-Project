@@ -52,7 +52,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             repeatOnLifecycle(Lifecycle.State.STARTED){
                 profileViewModel.state.collect{
                     binding.profilenameTextview.text = it.contactUser!!.name
-                    binding.profilePhoneNumber.text = it.contactUser.phone
+                    binding.profilePhoneNumber.text = it.contactUser.phoneOrEmail
 
                     if (it.profileBitmap != null){
                         binding.profilePic.setImageBitmap(it.profileBitmap)

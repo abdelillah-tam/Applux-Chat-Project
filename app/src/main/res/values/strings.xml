@@ -3,6 +3,13 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+
+    <string name="facebook_app_id">1257960478111042</string>
+    <string name="fb_login_protocol_scheme">fb1257960478111042</string>
+    <string name="facebook_client_token">66ac875b83c14379a5619ae1848145c6</string>
+
+
+
     <string-array name="CountryCodes">
         <item>93,AF</item>
         <item>355,AL</item>

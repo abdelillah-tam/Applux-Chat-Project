@@ -2,6 +2,7 @@ package com.example.applux.data.firebase.contactuser
 
 import androidx.fragment.app.FragmentActivity
 import com.example.applux.domain.models.ContactUser
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +23,11 @@ interface ContactUserRepository {
 
     fun sendVerificationCode(phone: String, require: FragmentActivity, callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks)
 
-    suspend fun signInWithCredential(
+    suspend fun signInWithPhoneCredential(
         credential: PhoneAuthCredential
+    ) : Boolean
+
+    suspend fun signInWithFacebookCredential(
+        credential: AuthCredential
     ) : Boolean
 }

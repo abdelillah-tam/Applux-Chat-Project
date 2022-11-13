@@ -4,9 +4,9 @@ data class Message(
     val messageId: String,
     var timestamp: String?,
     var text: String?,
-    var senderPhone: String?,
+    var senderPhoneOrEmail: String?,
     var senderUID: String?,
-    var receiverPhone: String?,
+    var receiverPhoneOrEmail: String?,
     var receiverUID: String?
 ) {
 

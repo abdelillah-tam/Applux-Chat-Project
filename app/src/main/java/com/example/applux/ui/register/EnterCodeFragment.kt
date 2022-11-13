@@ -69,7 +69,7 @@ class EnterCodeFragment : Fragment(R.layout.fragment_enter_code) {
     private fun verificationCode(code: String) {
         Log.e("TAG", "verificationCode: " + code)
         val credential = PhoneAuthProvider.getCredential(verificationId, code)
-        registerViewModel.signInWithCredentialViewModel(credential, phone)
+        registerViewModel.signInWithPhoneCredentialViewModel(credential, phone)
     }
 
 
