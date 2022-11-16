@@ -8,6 +8,7 @@
     <string name="fb_login_protocol_scheme">fb1257960478111042</string>
     <string name="facebook_client_token">66ac875b83c14379a5619ae1848145c6</string>
 
+    <string name="server_client_id">893150186758-6nuk415je014edkm12uum9ndkn5fh7ej.apps.googleusercontent.com</string>
 
 
     <string-array name="CountryCodes">
@@ -241,6 +242,9 @@
     <string name="about">About</string>
     <string name="privacy">Privacy</string>
     <string name="log_out">Log out</string>
+    <string name="sign_in">Sign in with Google</string>
+    <string name="continue_with_facebook">Continue with Facebook</string>
+    <string name="login_with_twitter">Login with Twitter</string>
 
     <string-array name="privacy">
         <item>No One</item>

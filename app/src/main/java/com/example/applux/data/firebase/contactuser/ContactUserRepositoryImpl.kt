@@ -174,4 +174,35 @@ class ContactUserRepositoryImpl @Inject constructor(
         return result
     }
 
+    override suspend fun signInWithGoogleCredential(credential: AuthCredential): Boolean {
+        var result = false
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener {
+                if (it.isSuccessful){
+                    result = true
+                }
+            }
+            .addOnFailureListener {
+                result = false
+            }
+            .await()
+
+        return result
+    }
+
+    override suspend fun signInWithTwitterCredential(credential: AuthCredential) : Boolean{
+        var result = false
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener {
+                if (it.isSuccessful){
+                    result = true
+                }
+            }
+            .addOnFailureListener {
+                result = false
+            }
+            .await()
+        return result
+    }
+
 }

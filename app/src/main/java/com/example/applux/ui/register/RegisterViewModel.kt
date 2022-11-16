@@ -17,19 +17,21 @@ class RegisterViewModel @Inject constructor(
     private val sendVerificationCode: SendVerificationCode,
     private val signInWithPhoneCredential: SignInWithPhoneCredential,
     private val signInWithFacebookCredential: SignInWithFacebookCredential,
+    private val signInWithGoogleCredential: SignInWithGoogleCredential,
+    private val signInWithTwitterCredential: SignInWithTwitterCredential,
     private val checkIfContactAlreadyExist: CheckIfContactAlreadyExist,
     private val createContactUser: CreateContactUser
-) : ViewModel(){
+) : ViewModel() {
 
     private val _state = MutableStateFlow(RegisterUiState())
-    val state : StateFlow<RegisterUiState> = _state.asStateFlow()
+    val state: StateFlow<RegisterUiState> = _state.asStateFlow()
 
 
     fun sendVerificationCodeViewModel(
         phone: String,
         require: FragmentActivity,
         callback: PhoneAuthProvider.OnVerificationStateChangedCallbacks
-    ){
+    ) {
         viewModelScope.launch {
             sendVerificationCode(
                 phone,
@@ -39,16 +41,16 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun signInWithPhoneCredentialViewModel(p0: PhoneAuthCredential, phone: String){
+    fun signInWithPhoneCredentialViewModel(p0: PhoneAuthCredential, phone: String) {
         viewModelScope.launch {
             signInWithPhoneCredential(p0).collect { result ->
-                if (result){
+                if (result) {
                     checkIfContactAlreadyExist(phone).collect { exist ->
-                        if (exist){
+                        if (exist) {
                             _state.update {
                                 it.copy(isExist = exist)
                             }
-                        }else{
+                        } else {
                             createCompleteAccountViewModel(phone)
                         }
                     }
@@ -58,14 +60,15 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    private fun createCompleteAccountViewModel(phoneOrEmail: String){
+    private fun createCompleteAccountViewModel(phoneOrEmail: String) {
         viewModelScope.launch {
-            val contactUser = ContactUser(auth.currentUser!!.uid,
+            val contactUser = ContactUser(
+                auth.currentUser!!.uid,
                 phoneOrEmail,
                 ""
-                )
+            )
             createContactUser(contactUser).collect {
-                if (it){
+                if (it) {
                     _state.update {
                         it.copy(isSignedIn = true)
                     }
@@ -74,16 +77,16 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun signInWithFacebookCredentialViewModel(p0: AuthCredential){
+    fun signInWithFacebookCredentialViewModel(p0: AuthCredential) {
         viewModelScope.launch {
-            signInWithFacebookCredential(p0).collect{ result ->
-                if (result){
-                    checkIfContactAlreadyExist(auth.currentUser!!.email!!).collect{ exist ->
-                        if (exist){
+            signInWithFacebookCredential(p0).collect { result ->
+                if (result) {
+                    checkIfContactAlreadyExist(auth.currentUser!!.email!!).collect { exist ->
+                        if (exist) {
                             _state.update {
                                 it.copy(isExist = exist)
                             }
-                        }else{
+                        } else {
                             createCompleteAccountViewModel(auth.currentUser!!.email!!)
                         }
 
@@ -93,13 +96,49 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
-    fun savePhone(phone: String){
+    fun signInWithGoogleCredentialViewModel(p0: AuthCredential) {
+        viewModelScope.launch {
+            signInWithGoogleCredential(p0).collect { result ->
+                if (result) {
+                    checkIfContactAlreadyExist(auth.currentUser!!.email!!).collect { exist ->
+                        if (exist) {
+                            _state.update {
+                                it.copy(isExist = exist)
+                            }
+                        } else {
+                            createCompleteAccountViewModel(auth.currentUser!!.email!!)
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    fun signInWithTwitterCredentialViewModel(email: String) {
+        viewModelScope.launch {
+            checkIfContactAlreadyExist(email).collect { exist ->
+                if (exist) {
+                    _state.update {
+                        it.copy(isExist = exist)
+                    }
+                } else {
+                    createCompleteAccountViewModel(email)
+                }
+
+            }
+        }
+
+
+    }
+
+    fun savePhone(phone: String) {
         _state.update {
             it.copy(phone = phone)
         }
     }
 
-    fun saveVerificationId(verificationId: String){
+    fun saveVerificationId(verificationId: String) {
         _state.update {
             it.copy(verificationId = verificationId)
         }

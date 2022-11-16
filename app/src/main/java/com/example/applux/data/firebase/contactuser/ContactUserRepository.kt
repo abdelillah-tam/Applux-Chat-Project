@@ -30,4 +30,10 @@ interface ContactUserRepository {
     suspend fun signInWithFacebookCredential(
         credential: AuthCredential
     ) : Boolean
+    suspend fun signInWithGoogleCredential(
+        credential: AuthCredential
+    ) : Boolean
+    suspend fun signInWithTwitterCredential(
+        credential: AuthCredential
+    ) : Boolean
 }
