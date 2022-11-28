@@ -69,24 +69,28 @@ class MessageRepositoryImpl @Inject constructor(
         position: Message?
     ): Flow<QuerySnapshot?> = flow {
 
-        val messages = contactCollectionReference.document(auth.currentUser!!.uid)
-            .collection("sharedChat").document(receiverUid).collection("messages")
+            val messages = contactCollectionReference.document(auth.currentUser!!.uid)
+                .collection("sharedChat").document(receiverUid).collection("messages")
 
-        var gotMsgs: QuerySnapshot?
-        if (firstTime) {
-            gotMsgs =
-                messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
-                    .get().await()
+            var gotMsgs: QuerySnapshot?
+            if (firstTime) {
+                gotMsgs =
+                    messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
+                        .get().await()
 
-        } else {
-            gotMsgs =
-                messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
-                    .startAfter(position?.timestamp)
-                    .get().await()
-        }
-        if (gotMsgs != null && gotMsgs.size() != 0) {
-            emit(gotMsgs)
-        }
+            } else {
+                gotMsgs =
+                    messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
+                        .startAfter(position?.timestamp)
+                        .get().await()
+            }
+            if (gotMsgs != null && gotMsgs.size() != 0) {
+                Log.e(TAG, "getAllMessages: inside if statement called" )
+                emit(gotMsgs)
+            }else{
+                emit(null)
+            }
+
     }
     override fun getUsersYouTalkedWith(): Flow<Set<Message>> = callbackFlow {
         var finalContactWithLastMessage = emptySet<Message>()
@@ -104,7 +108,6 @@ class MessageRepositoryImpl @Inject constructor(
                         trySend(finalContactWithLastMessage)
                         finalContactWithLastMessage = emptySet()
                     } catch (e: Throwable) {
-
                     }
                 }
             }

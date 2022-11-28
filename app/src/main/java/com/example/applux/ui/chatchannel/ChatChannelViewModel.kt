@@ -107,40 +107,48 @@ class ChatChannelViewModel @Inject constructor(
             )
                 .collect { query ->
                     Log.e("TAG", "getAllMessagesViewModel: called")
-                    val position = query!!.documents[query.size() - 1].toObject(Message::class.java)
-                    val list = HashMap<String, MessageUiState>()
-                    if (query.size() > 0) {
-                        query.toObjects(Message::class.java).forEach { message ->
-                            if (message.messageType!!.equals(MessageType.IMAGE)) {
-                                getMessageImage(message.imageLink!!).collect{ bitmap ->
-                                    list.put(message.messageId, MessageUiState(message, bitmap))
+                    if (query != null) {
+                        val position =
+                            query!!.documents[query.size() - 1].toObject(Message::class.java)
+                        val list = HashMap<String, MessageUiState>()
+                        if (query.size() > 0) {
+                            query.toObjects(Message::class.java).forEach { message ->
+                                if (message.messageType!!.equals(MessageType.IMAGE)) {
+                                    getMessageImage(message.imageLink!!).collect { bitmap ->
+                                        list.put(message.messageId, MessageUiState(message, bitmap))
+                                    }
+                                } else {
+                                    list.put(message.messageId, MessageUiState(message, null))
                                 }
-                            }else{
-                                list.put(message.messageId, MessageUiState(message, null))
                             }
                         }
-                    }
 
-                    _state.update {
-                        val hs = HashMap(it.messages)
-                        hs.putAll(list)
+                        _state.update {
+                            val hs = HashMap(it.messages)
+                            hs.putAll(list)
 
-                        if (it.firstTime) {
-                            listenForNewMessageViewModel()
-                            ChatChannelUiState(
-                                it.profilePictureBitmap,
-                                it.contactUser,
-                                list,
-                                it.about,
-                                it.lastSeen,
-                                it.isSent,
-                                false,
-                                position,
-                                it.newMessage
-                            )
-                        } else if (!hs.equals(it.messages)) {
-                            it.copy(messages = hs)
-                        } else {
+                            if (it.firstTime) {
+                                listenForNewMessageViewModel()
+                                ChatChannelUiState(
+                                    it.profilePictureBitmap,
+                                    it.contactUser,
+                                    list,
+                                    it.about,
+                                    it.lastSeen,
+                                    it.isSent,
+                                    false,
+                                    position,
+                                    it.newMessage
+                                )
+                            } else if (!hs.equals(it.messages)) {
+                                it.copy(messages = hs)
+                            } else {
+                                it.disableLoading = false
+                                it.copy(disableLoading = true)
+                            }
+                        }
+                    }else{
+                        _state.update {
                             it.disableLoading = false
                             it.copy(disableLoading = true)
                         }
@@ -199,9 +207,7 @@ class ChatChannelViewModel @Inject constructor(
     private fun getMessageImage(imageLink: String): Flow<Bitmap> = flow {
 
         val bitmap = withContext(Dispatchers.IO) {
-            Glide.with(context).asBitmap()
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE).load(imageLink).submit().get()
+            Glide.with(context).asBitmap().load(imageLink).submit().get()
         }
         emit(bitmap)
 

@@ -94,13 +94,11 @@ class ChatchannelAdapter @Inject constructor() :
         }
 
         if (messageUiState.message.messageType!!.equals(MessageType.IMAGE) && messageUiState.bitmap != null){
-            //Glide.with(holder.itemView.context).load(messageUiState.message.imageLink).into(holder.msgImage)
             holder.msgImage.setImageBitmap(messageUiState.bitmap)
             holder.msgImage.visibility = ShapeableImageView.VISIBLE
         }else{
             holder.msgImage.visibility = ShapeableImageView.GONE
         }
-
 
         holder.msgText.text = messageUiState.message.text
         val dateString = timestampToHoursAndMinutes(messageUiState.message.timestamp!!)
