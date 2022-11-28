@@ -9,6 +9,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.applux.OnlineOrOffline
 import com.example.applux.R
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -43,9 +44,12 @@ class ChatsRecyclerAdapter @Inject constructor() :
 
         val chatItemUiState = setOfUsers.elementAt(position)
 
-        if (chatItemUiState.profileBitmap != null){
-            holder.contactImage.setImageBitmap(chatItemUiState.profileBitmap)
+        if (chatItemUiState.picture != null && chatItemUiState.picture!!.pic.isNotEmpty()){
+            Glide.with(holder.itemView.context).load(chatItemUiState.picture!!.pic).into(holder.contactImage)
+        }else{
+            Glide.with(holder.itemView.context).load(R.drawable.ic_face).into(holder.contactImage)
         }
+
         if (chatItemUiState.message != null) {
             holder.contactLastMsg.text = chatItemUiState.message!!.text
         }

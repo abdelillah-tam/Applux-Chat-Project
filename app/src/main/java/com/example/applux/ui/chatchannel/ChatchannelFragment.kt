@@ -19,6 +19,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.applux.OnlineOrOffline
 import com.example.applux.Privacy
 import com.example.applux.R
@@ -27,6 +28,7 @@ import com.example.applux.data.WorldTimeModel
 import com.example.applux.databinding.FragmentChatchannelBinding
 import com.example.applux.domain.models.ContactUser
 import com.example.applux.domain.models.Message
+import com.example.applux.domain.models.MessageType
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
@@ -73,7 +75,9 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 chatChannelViewModel.state.collect {
                     if (it.profilePictureBitmap != null) {
-                        binding.receiverprofilepic.setImageBitmap(it.profilePictureBitmap)
+                        Glide.with(requireContext()).load(it.profilePictureBitmap).into(binding.receiverprofilepic)
+                    }else{
+                        Glide.with(requireContext()).load(R.drawable.ic_face).into(binding.receiverprofilepic)
                     }
                     if (it.contactUser != null) {
                         binding.receivernameTextview.text = it.contactUser.name
@@ -102,7 +106,7 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
                     }
                     if (it.messages.isNotEmpty()) {
                         chatchannelAdapter.addMessages(ArrayList(it.messages.values.sortedBy {
-                            it.timestamp
+                            it.message.timestamp
                         }))
                         binding.loadingChats.visibility = View.GONE
                     } else {
@@ -171,7 +175,9 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
                             auth.currentUser!!.phoneNumber,
                             auth.currentUser!!.uid,
                             contact.phoneOrEmail,
-                            contact.uid
+                            contact.uid,
+                            MessageType.TEXT,
+                            null
                         )
                         chatChannelViewModel.sendMessageViewModel(message)
                     }
@@ -182,12 +188,12 @@ class ChatchannelFragment : Fragment(R.layout.fragment_chatchannel) {
 
 
                 })
-
-
-
-
         }
 
+        binding.chatchannelCameraButton.setOnClickListener {
+            val action = ChatchannelFragmentDirections.actionChatchannelFragmentToCameraFragment(contact)
+            findNavController().navigate(action)
+        }
 
     }
 

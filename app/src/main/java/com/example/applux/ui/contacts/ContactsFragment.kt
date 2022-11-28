@@ -36,6 +36,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ContactsFragment : Fragment(R.layout.fragment_contacts) {
     private val TAG = "ContactsFragment"
+
     private val FROM = arrayOf(
         ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
         ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,

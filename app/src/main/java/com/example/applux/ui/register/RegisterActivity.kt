@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.res.ResourcesCompat
@@ -49,7 +50,7 @@ class RegisterActivity : AppCompatActivity() {
     private val registerViewModel: RegisterViewModel by viewModels()
 
     private lateinit var gso: GoogleSignInOptions
-
+    private lateinit var signInActivityResultLauncher : ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +61,18 @@ class RegisterActivity : AppCompatActivity() {
         navHost = supportFragmentManager.findFragmentById(R.id.registerfraghost) as NavHostFragment
         navController = navHost.navController
 
+        signInActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                    registerViewModel.signInWithGoogleCredentialViewModel(credential)
+                } catch (e: ApiException) {
+                    Log.e("TAG", "signInResult:failed code=" + e.statusCode)
+                }
+
+            }
 
         binding.signInButton.setOnClickListener {
             signInWithGoogle()
@@ -115,18 +128,6 @@ class RegisterActivity : AppCompatActivity() {
 
         val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-        val signInActivityResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                try {
-                    val account = task.getResult(ApiException::class.java)
-                    val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-                    registerViewModel.signInWithGoogleCredentialViewModel(credential)
-                } catch (e: ApiException) {
-                    Log.e("TAG", "signInResult:failed code=" + e.statusCode)
-                }
-
-            }
         signInActivityResultLauncher.launch(mGoogleSignInClient.signInIntent)
     }
 

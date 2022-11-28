@@ -6,17 +6,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class UploadProfilePicture @Inject constructor(
+class UploadMessagePicture @Inject constructor(
     private val pictureRepository: PictureRepository
 ) {
-
-    operator fun invoke(byte: ByteArray,fileName: String) : Flow<Uri?> = flow {
-        pictureRepository.uploadProfilePicture(byte, fileName).collect{
-            if (it != null){
-                emit(it)
-            }
+    operator fun invoke(receiverUid: String, byteArray: ByteArray, fileName: String) : Flow<Uri?> = flow{
+        pictureRepository.uploadMessagePicture(receiverUid, byteArray, fileName).collect{
+            emit(it)
         }
 
     }
-
 }

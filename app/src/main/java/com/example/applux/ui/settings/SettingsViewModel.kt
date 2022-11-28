@@ -1,7 +1,8 @@
 package com.example.applux.ui.settings
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.provider.MediaStore
+import androidx.core.graphics.createBitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.applux.domain.models.UserMessage
@@ -20,8 +21,6 @@ class SettingsViewModel @Inject constructor(
     private val getAbout: GetAbout,
     private val getProfilePicture: GetProfilePicture,
     private val getLastSeen: GetLastSeen,
-    private val downloadProfilePicture: DownloadProfilePicture,
-    private val firebase: FirebaseAuth,
     private val updateAbout: UpdateAbout,
     private val updateUsername: UpdateUsername,
     private val updatePrivacies: UpdatePrivacies,
@@ -68,10 +67,6 @@ class SettingsViewModel @Inject constructor(
                     _state.update {
                         it.copy(picture = profilePicture)
                     }
-
-                    if (!it.pic.equals("")) {
-                        getProfilePictureFileViewModel(firebase.currentUser!!.uid, it.pic)
-                    }
                 }
             }
         }
@@ -87,28 +82,13 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun getProfilePictureFileViewModel(uid: String, fileName: String) {
-        viewModelScope.launch {
-            downloadProfilePicture(uid, fileName).collect {
-                val byteArray = it
-                _state.update {
-                    it.copy(
-                        profileBitmap = BitmapFactory.decodeByteArray(
-                            byteArray,
-                            0,
-                            byteArray!!.size
-                        )
-                    )
-                }
-            }
-        }
-    }
 
-    private fun updateProfilePictureFileNameViewModel(fileName: String){
+
+    private fun updateProfilePictureFileNameViewModel(fileLink: String){
         viewModelScope.launch {
-            updateProfilePictureFileName(fileName).collect { result ->
+            updateProfilePictureFileName(fileLink).collect { result ->
                 if (result){
-                    getProfilePictureFileViewModel(firebase.currentUser!!.uid, fileName)
+
                 }
             }
         }
@@ -231,22 +211,23 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.UploadProfilePicture -> {
                 viewModelScope.launch {
                     val baos = ByteArrayOutputStream()
-                    val rawBit = Bitmap.createScaledBitmap(
-                        event.bitmap,
-                        ((event.bitmap.width * 0.3).toInt()),
-                        ((event.bitmap.height * 0.3).toInt()),
-                        false
-                    )
+
+                    val bitmap = MediaStore.Images.Media.getBitmap(event.contentResolver, event.uri)
+
+                    if (bitmap.byteCount > 500000) {
+                        bitmap.compress(Bitmap.CompressFormat.WEBP, 40, baos)
+                    }else bitmap.compress(Bitmap.CompressFormat.WEBP, 100, baos)
+
                     val fileName = UUID.nameUUIDFromBytes(baos.toByteArray()).toString()
-                    rawBit.compress(Bitmap.CompressFormat.JPEG, 50, baos)
+
                     uploadProfilePicture(baos.toByteArray(), fileName).collect { result ->
                         _state.update { uiState ->
-                            if (result) {
+                            if (result != null) {
                                 val messages = uiState.userMessages + UserMessage(
                                     id = UUID.randomUUID().mostSignificantBits,
                                     message = "Profile Picture is uploaded successfully"
                                 )
-                                updateProfilePictureFileNameViewModel(fileName)
+                                updateProfilePictureFileNameViewModel(result.toString())
                                 uiState.copy(userMessages = messages)
                             } else {
                                 val messages = uiState.userMessages + UserMessage(

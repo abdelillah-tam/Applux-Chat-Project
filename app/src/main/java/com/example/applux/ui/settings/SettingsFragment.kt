@@ -3,6 +3,9 @@ package com.example.applux.ui.settings
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.Editable
@@ -26,6 +29,13 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.Request
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.example.applux.Privacy
 import com.example.applux.R
 import com.example.applux.databinding.EditPrivaciesBinding
@@ -49,7 +59,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
 
     private lateinit var navController: NavController
 
-    private lateinit var bitmap: Bitmap
+    private var isComingFromGallery = false
+
+    private lateinit var uri: Uri
     private lateinit var loading: AlertDialog
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,11 +112,13 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 when (item?.itemId) {
                     R.id.home ->{}
                     R.id.save -> {
+                        isComingFromGallery = false
                         val loadingBinding = LoadingBinding.inflate(layoutInflater)
                         loading = MaterialAlertDialogBuilder(requireContext())
                             .setView(loadingBinding.root)
                             .show()
-                        settingsViewModel.onEvent(SettingsEvent.UploadProfilePicture(bitmap))
+                        //settingsViewModel.onEvent(SettingsEvent.UploadProfilePicture(bitmap))
+                        settingsViewModel.onEvent(SettingsEvent.UploadProfilePicture(uri, requireContext().contentResolver))
                     }
 
                 }
@@ -121,10 +135,12 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             if (it != null) {
                 Glide.with(requireContext())
                     .load(it)
+                    .skipMemoryCache(true)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .into(binding.settingsProfilePic)
-                bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, it)
+                //bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, it)
+                uri = it
                 actionMode = binding.appBarLayout.startActionMode(actionModeCallback)
-
 
             }
         }
@@ -139,10 +155,14 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                         binding.settingsUsername.text = state.value.contactUser!!.name
                     }
 
-                    if (it.picture != null) {
+                    if (it.picture != null && !isComingFromGallery) {
 
                         if (it.picture.pic.equals("") || it.picture.privacy.equals(Privacy.NONOE)) {
                             binding.settingsProfilePic.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_face, null))
+                        }else{
+                            Glide.with(requireContext())
+                                .load(it.picture.pic)
+                                .into(binding.settingsProfilePic)
                         }
 
                         when (it.picture.privacy) {
@@ -156,7 +176,9 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                                 binding.settingsPrivacyProfilephoto.text = privacies[2]
                             }
                         }
-                        binding.settingsProfilePic.setImageBitmap(state.value.profileBitmap)
+
+
+
                     }
 
                     if (it.about != null) {
@@ -199,9 +221,8 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
             }
         }
 
-
-
         binding.settingsProfilePic.setOnClickListener{
+            isComingFromGallery = true
             getContent.launch("image/*")
         }
 
@@ -282,6 +303,7 @@ class SettingsFragment : Fragment(R.layout.fragment_settings) {
                 }
                 .show()
         }
+
         binding.settingsPrivacyProfilephoto.setOnClickListener{
             val privacyBinding = EditPrivaciesBinding.inflate(layoutInflater)
             val autoComTxtView =

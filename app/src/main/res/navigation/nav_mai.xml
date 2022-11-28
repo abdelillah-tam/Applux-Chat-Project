@@ -55,6 +55,9 @@
             android:name="lastseen"
             app:argType="com.example.applux.domain.models.LastSeen"
             app:nullable="true" />
+        <action
+            android:id="@+id/action_chatchannelFragment_to_cameraFragment"
+            app:destination="@id/cameraFragment" />
     </fragment>
     <fragment
         android:id="@+id/profileFragment"
@@ -78,5 +81,31 @@
         <action
             android:id="@+id/action_settingsFragment_to_mainFragment"
             app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.example.applux.ui.camera.CameraFragment"
+        tools:layout="@layout/fragment_camera" >
+        <action
+            android:id="@+id/action_cameraFragment_to_chatchannelFragment"
+            app:destination="@id/chatchannelFragment" />
+        <action
+            android:id="@+id/action_cameraFragment_to_previewCapturedImageFragment"
+            app:destination="@id/previewCapturedImageFragment" />
+        <argument
+            android:name="contact"
+            app:argType="com.example.applux.domain.models.ContactUser" />
+    </fragment>
+    <fragment
+        android:id="@+id/previewCapturedImageFragment"
+        android:name="com.example.applux.ui.camera.PreviewCapturedImageFragment"
+        tools:layout="@layout/fragment_preview_captured_image" >
+        <argument android:name="Uri" />
+        <argument
+            android:name="contactUser"
+            app:argType="com.example.applux.domain.models.ContactUser" />
+        <action
+            android:id="@+id/action_previewCapturedImageFragment_to_chatchannelFragment"
+            app:destination="@id/chatchannelFragment" />
     </fragment>
 </navigation>

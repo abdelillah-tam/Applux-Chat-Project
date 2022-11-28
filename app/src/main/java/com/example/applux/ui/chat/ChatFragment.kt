@@ -2,7 +2,6 @@ package com.example.applux.ui.chat
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.Fragment
@@ -14,16 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.applux.R
-import com.example.applux.data.TimeByZoneClient
-import com.example.applux.data.WorldTimeModel
 import com.example.applux.databinding.FragmentChatBinding
 import com.example.applux.ui.main.MainFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import org.joda.time.DateTimeZone
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -35,6 +28,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     @Inject
     lateinit var chatAdapter: ChatsRecyclerAdapter
+
 
 
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")
@@ -52,7 +46,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         chatAdapter.setResources(resources)
         val state = chatViewModel.state
 
-        val zone = DateTimeZone.getDefault()
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -61,8 +54,6 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         it.timestamp
                     }))
                 }
-
-                //chatAdapter.setAllUsers(array)
 
 
             }
@@ -85,11 +76,11 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                             binding.chatsRecyclerview.getChildAdapterPosition(viewPosition)
                         val user = chatAdapter.getChatItem(position)
 
-                        if (user.contactUser != null && user.profileBitmap != null) {
+                        if (user.contactUser != null) {
                             val action =
                                 MainFragmentDirections.actionMainFragmentToChatchannelFragment(
                                     user.contactUser!!,
-                                    user.profileBitmap!!,
+                                    user.profileBitmap,
                                     user.lastSeen
                                 )
                             findNavController().navigate(action)

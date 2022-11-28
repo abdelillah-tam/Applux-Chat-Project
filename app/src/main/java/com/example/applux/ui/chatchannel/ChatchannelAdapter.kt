@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.applux.R
 import com.example.applux.data.TimeByZoneClient
 import com.example.applux.data.WorldTimeModel
 import com.example.applux.domain.models.Message
+import com.example.applux.domain.models.MessageType
+import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.scopes.FragmentScoped
@@ -30,7 +33,7 @@ class ChatchannelAdapter @Inject constructor() :
     RecyclerView.Adapter<ChatchannelAdapter.MessageViewHolder>() {
     @Inject
     lateinit var auth: FirebaseAuth
-    private var array: ArrayList<Message> = ArrayList()
+    private var array: ArrayList<MessageUiState> = ArrayList()
     private val SENDER = 1
     private val RECEIVER = 2
 
@@ -60,6 +63,7 @@ class ChatchannelAdapter @Inject constructor() :
 
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val date = itemView.findViewById(R.id.date) as MaterialTextView
+        val msgImage = itemView.findViewById(R.id.message_image) as ShapeableImageView
         val msgText = itemView.findViewById(R.id.message_text) as MaterialTextView
         val msgDate = itemView.findViewById(R.id.msg_date) as MaterialTextView
     }
@@ -77,9 +81,9 @@ class ChatchannelAdapter @Inject constructor() :
     }
 
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
-        val message = array.get(position)
+        val messageUiState = array.get(position)
 
-        val result = calculateDate(message.timestamp!!.toLong())
+        val result = calculateDate(messageUiState.message.timestamp!!.toLong())
 
         if (lastDateValue.equals(result)) {
             holder.date.visibility = MaterialTextView.GONE
@@ -89,14 +93,23 @@ class ChatchannelAdapter @Inject constructor() :
             lastDateValue = result
         }
 
-        holder.msgText.text = message.text
-        val dateString = timestampToHoursAndMinutes(message.timestamp!!)
+        if (messageUiState.message.messageType!!.equals(MessageType.IMAGE) && messageUiState.bitmap != null){
+            //Glide.with(holder.itemView.context).load(messageUiState.message.imageLink).into(holder.msgImage)
+            holder.msgImage.setImageBitmap(messageUiState.bitmap)
+            holder.msgImage.visibility = ShapeableImageView.VISIBLE
+        }else{
+            holder.msgImage.visibility = ShapeableImageView.GONE
+        }
+
+
+        holder.msgText.text = messageUiState.message.text
+        val dateString = timestampToHoursAndMinutes(messageUiState.message.timestamp!!)
         holder.msgDate.text = dateString
 
     }
 
 
-    fun addMessages(messages: ArrayList<Message>) {
+    fun addMessages(messages: ArrayList<MessageUiState>) {
         val diff = Diff(this.array, messages)
         val diffResult = DiffUtil.calculateDiff(diff)
 
@@ -110,8 +123,8 @@ class ChatchannelAdapter @Inject constructor() :
     }
 
     override fun getItemViewType(position: Int): Int {
-        val message = array.elementAt(position)
-        if (message.senderUID == auth.currentUser!!.uid) {
+        val messageUiState = array.elementAt(position)
+        if (messageUiState.message.senderUID == auth.currentUser!!.uid) {
             return SENDER
         } else {
             return RECEIVER
@@ -159,8 +172,8 @@ class ChatchannelAdapter @Inject constructor() :
     }
 
     class Diff(
-        val oldList: ArrayList<Message>,
-        val newList: ArrayList<Message>
+        val oldList: ArrayList<MessageUiState>,
+        val newList: ArrayList<MessageUiState>
     ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int {
             return oldList.size
@@ -171,7 +184,8 @@ class ChatchannelAdapter @Inject constructor() :
         }
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].messageId.equals(newList[newItemPosition].messageId)
+
+            return oldList[oldItemPosition].message.messageId.equals(newList[newItemPosition].message.messageId)
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

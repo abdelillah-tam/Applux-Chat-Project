@@ -16,8 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ContactsViewModel @Inject constructor(
     private val findContactUser: FindContactUser,
-    private val getProfilePicture: GetProfilePicture,
-    private val downloadProfilePicture: DownloadProfilePicture
+    private val getProfilePicture: GetProfilePicture
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ContactsUiState())
@@ -48,26 +47,15 @@ class ContactsViewModel @Inject constructor(
     private fun getProfilePictureViewModel(uid: String, positionInList: Int) {
         viewModelScope.launch {
             getProfilePicture(uid).collect { profilePicture ->
-                if (profilePicture != null) downloadProfilePicture(
-                    uid,
-                    profilePicture.pic
-                ).collect { byteArray ->
+                if (profilePicture != null){
                     _state.update {
                         val list = ArrayList<ContactsItemUiState>()
                         list.addAll(it.contactsItemUiState)
                         val item = ContactsItemUiState(
-                            picture = list.get(positionInList).picture,
+                            picture = profilePicture,
                             contactUser = list.get(positionInList).contactUser,
                             profileBitmap = list.get(positionInList).profileBitmap
                         )
-
-                        if (byteArray != null) {
-                            item.profileBitmap =
-                                BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                        } else {
-                            item.profileBitmap = null
-                        }
-
                         list.set(positionInList, item)
                         it.copy(contactsItemUiState = list)
                     }
@@ -77,4 +65,31 @@ class ContactsViewModel @Inject constructor(
         }
     }
 
+
+
+
+   /* downloadProfilePicture(
+    uid,
+    profilePicture.pic
+    ).collect { byteArray ->
+        _state.update {
+            val list = ArrayList<ContactsItemUiState>()
+            list.addAll(it.contactsItemUiState)
+            val item = ContactsItemUiState(
+                picture = list.get(positionInList).picture,
+                contactUser = list.get(positionInList).contactUser,
+                profileBitmap = list.get(positionInList).profileBitmap
+            )
+
+            if (byteArray != null) {
+                item.profileBitmap =
+                    BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+            } else {
+                item.profileBitmap = null
+            }
+
+            list.set(positionInList, item)
+            it.copy(contactsItemUiState = list)
+        }
+    }*/
 }

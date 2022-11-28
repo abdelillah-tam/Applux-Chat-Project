@@ -5,11 +5,16 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:layout_margin="8dp"
+        android:indeterminate="true"
         app:trackColor="@color/orange_100"
         app:indicatorColor="@color/orange_500"
+        app:trackThickness="3dp"
+        app:trackCornerRadius="16dp"
+        app:indicatorSize="56dp"
+        app:indicatorDirectionCircular="clockwise"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.applux.R
 import com.example.applux.domain.models.Contact
 import com.google.android.material.imageview.ShapeableImageView
@@ -37,10 +38,10 @@ class CursorRecyclerViewAdapter @Inject constructor() : RecyclerView.Adapter<Cur
 
         holder.nameTextView.text = getName
         holder.numberTextView.text = getNumber
-        if (contact.profileBitmap == null){
+        if (contact.picture == null){
             holder.contactPic.setImageResource(R.drawable.ic_face)
         }else{
-            holder.contactPic.setImageBitmap(contact.profileBitmap)
+            Glide.with(holder.itemView.context).load(contact.picture!!.pic).into(holder.contactPic)
         }
 
     }

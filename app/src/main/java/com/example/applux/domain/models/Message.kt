@@ -7,9 +7,20 @@ data class Message(
     var senderPhoneOrEmail: String?,
     var senderUID: String?,
     var receiverPhoneOrEmail: String?,
-    var receiverUID: String?
+    var receiverUID: String?,
+    var messageType: MessageType?,
+    var imageLink: String?
 ) {
 
-    constructor() : this("", "", "", "", "", "", "")
+    constructor() : this(
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        null,
+        null)
 
 }

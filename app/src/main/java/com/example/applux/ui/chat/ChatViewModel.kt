@@ -1,26 +1,27 @@
 package com.example.applux.ui.chat
 
-import android.graphics.BitmapFactory
-import android.util.Log
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.bumptech.glide.Glide
 import com.example.applux.domain.models.Picture
 import com.example.applux.domain.usecases.*
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
     private val getUsersYouTalkedWith: GetUsersYouTalkedWith,
     private val getContact: GetContact,
     private val getProfilePicture: GetProfilePicture,
-    private val downloadProfilePicture: DownloadProfilePicture,
     private val userState: UserState,
     private val auth: FirebaseAuth
 ) : ViewModel() {
@@ -47,7 +48,10 @@ class ChatViewModel @Inject constructor(
                         messageStatementExpressionUid = message.receiverUID
                     }
 
-                    if (!messageStatementExpressionUid.equals("") && !list.containsKey(messageStatementExpressionUid)) {
+                    if (!messageStatementExpressionUid.equals("") && !list.containsKey(
+                            messageStatementExpressionUid
+                        )
+                    ) {
                         val chatItemUiState = ChatItemUiState()
                         chatItemUiState.message = message
                         chatItemUiState.timestamp = message.timestamp
@@ -61,10 +65,10 @@ class ChatViewModel @Inject constructor(
                             messageStatementExpressionUid,
                             chatItemUiState
                         )
-                    }else{
+                    } else {
                         val updatedChatItemUiState = list.get(messageStatementExpressionUid)
-                            updatedChatItemUiState!!.message = message
-                            updatedChatItemUiState.timestamp = message.timestamp
+                        updatedChatItemUiState!!.message = message
+                        updatedChatItemUiState.timestamp = message.timestamp
                         list.set(messageStatementExpressionUid, updatedChatItemUiState)
                     }
 
@@ -114,29 +118,24 @@ class ChatViewModel @Inject constructor(
         newUpdate: ChatItemUiState
     ) {
         viewModelScope.launch {
-            downloadProfilePicture(
-                uid,
-                profilePicture!!.pic
-            ).collect { byteArray ->
-                if (byteArray != null) {
-                    newUpdate.profileBitmap =
-                        BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-                } else {
-                    newUpdate.profileBitmap = null
-                }
-                if (_state.value != null) {
-                    list.set(uid, newUpdate)
-                    _state.value = ChatUiState(list)
-                    firstRun = false
-                }
+            withContext(Dispatchers.IO) {
+                val gml = Glide.with(context).asBitmap().load(profilePicture!!.pic).submit().get()
+                newUpdate.profileBitmap = gml
+            }
+
+            if (_state.value != null) {
+                list.set(uid, newUpdate)
+                _state.value = ChatUiState(list)
+                firstRun = false
             }
         }
+
     }
 
-    fun userStateViewModel(uid: String){
+    fun userStateViewModel(uid: String) {
         viewModelScope.launch {
-            userState(uid).collect{
-                if (it != null && list.containsKey(uid)){
+            userState(uid).collect {
+                if (it != null && list.containsKey(uid)) {
                     val chatItemUiState = list.get(uid)
                     chatItemUiState!!.lastSeen = it
                     list.set(uid, chatItemUiState)
@@ -146,3 +145,4 @@ class ChatViewModel @Inject constructor(
         }
     }
 }
+

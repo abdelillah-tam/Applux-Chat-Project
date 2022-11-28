@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 interface MessageRepository {
     suspend fun sendMessage(message: Message) : Boolean
 
+
     suspend fun getAllMessages(receiverUid: String, firstTime: Boolean, position: Message?) : Flow<QuerySnapshot?>
 
     fun getUsersYouTalkedWith() : Flow<Set<Message>>

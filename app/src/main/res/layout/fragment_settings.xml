@@ -26,6 +26,7 @@
             app:scrimAnimationDuration="70"
             app:toolbarId="@id/toolbar_settings_fragment">
 
+
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/settings_profile_pic"
                 android:layout_width="200dp"
@@ -35,6 +36,7 @@
                 android:layout_gravity="center_horizontal"
                 app:shapeAppearanceOverlay="@style/CircleImage"
                 app:layout_collapseMode="parallax"
+                android:adjustViewBounds="true"
                 tools:src="@drawable/markzucker" />
 
             <com.google.android.material.appbar.MaterialToolbar
@@ -46,6 +48,8 @@
                 app:titleTextColor="@color/black"
                 tools:title="Hello" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
