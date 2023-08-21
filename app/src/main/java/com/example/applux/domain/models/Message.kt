@@ -1,15 +1,17 @@
 package com.example.applux.domain.models
 
 data class Message(
-    val messageId: String,
-    var timestamp: String?,
-    var text: String?,
-    var senderPhoneOrEmail: String?,
-    var senderUID: String?,
-    var receiverPhoneOrEmail: String?,
-    var receiverUID: String?,
-    var messageType: MessageType?,
-    var imageLink: String?
+    val messageId: String = "",
+    var timestamp: String? = "",
+    var text: String? = "",
+    var receiverUid: String? = "",
+    var senderUID: String? = "",
+    var messageType: MessageType? = null,
+    var imageLink: String? = null,
+    var day: Int = 0,
+    var week: String = "",
+    var month: Int = 0,
+    var year: Int = 0
 ) {
 
     constructor() : this(
@@ -18,9 +20,12 @@ data class Message(
         "",
         "",
         "",
-        "",
-        "",
         null,
-        null)
+        null,
+        0,
+        "",
+        0,
+        0
+    )
 
 }

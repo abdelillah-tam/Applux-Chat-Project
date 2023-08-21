@@ -9,20 +9,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.applux.R
-import com.example.applux.databinding.FragmentChatBinding
-import com.example.applux.ui.main.MainFragmentDirections
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-@AndroidEntryPoint
-class ChatFragment : Fragment(R.layout.fragment_chat) {
-    private lateinit var binding: FragmentChatBinding
+class ChatFragment : Fragment() {
 
     private val chatViewModel: ChatViewModel by activityViewModels()
 
@@ -34,26 +25,20 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
     @SuppressLint("UnsafeRepeatOnLifecycleDetector")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentChatBinding.bind(view)
 
-        binding.chatsRecyclerview.apply {
-            adapter = chatAdapter
-            layoutManager = LinearLayoutManager(context)
-            animation = null
-            itemAnimator = null
-            stateListAnimator = null
-        }
+
+
         chatAdapter.setResources(resources)
         val state = chatViewModel.state
 
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                state.observe(viewLifecycleOwner){
-                    chatAdapter.setAllUsers(ArrayList(it.chatItemUiState.values.sortedByDescending{
-                        it.timestamp
-                    }))
-                }
+//                state.observe(viewLifecycleOwner){
+//                    chatAdapter.setAllUsers(ArrayList(it.chatItemUiState.values.sortedByDescending{
+//                        it.timestamp
+//                    }))
+//                }
 
 
             }
@@ -70,20 +55,19 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
 
                 override fun onSingleTapUp(p0: MotionEvent): Boolean {
-                    val viewPosition = binding.chatsRecyclerview.findChildViewUnder(p0.x, p0.y)
+                    val viewPosition = "binding.chatsRecyclerview.findChildViewUnder(p0.x, p0.y)"
                     if (viewPosition != null) {
-                        val position =
-                            binding.chatsRecyclerview.getChildAdapterPosition(viewPosition)
-                        val user = chatAdapter.getChatItem(position)
+                        //val position = binding.chatsRecyclerview.getChildAdapterPosition(viewPosition)
+                        val user = chatAdapter.getChatItem(0)
 
                         if (user.contactUser != null) {
-                            val action =
+                            /*val action =
                                 MainFragmentDirections.actionMainFragmentToChatchannelFragment(
                                     user.contactUser!!,
                                     user.profileBitmap,
                                     user.lastSeen
                                 )
-                            findNavController().navigate(action)
+                            findNavController().navigate(action)*/
                         }
                     }
                     return false
@@ -113,13 +97,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
             })
 
 
-        binding.chatsRecyclerview.addOnItemTouchListener(object :
-            RecyclerView.SimpleOnItemTouchListener() {
-            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                gestureDetector.onTouchEvent(e)
-                return false
-            }
-        })
+
     }
 
 }

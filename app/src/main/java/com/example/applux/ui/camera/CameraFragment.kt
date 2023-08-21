@@ -1,3 +1,4 @@
+/*
 package com.example.applux.ui.camera
 
 import android.Manifest
@@ -166,4 +167,4 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     }
 
 
-}
+}*/

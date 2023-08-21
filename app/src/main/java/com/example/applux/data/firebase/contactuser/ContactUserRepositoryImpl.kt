@@ -1,12 +1,16 @@
 package com.example.applux.data.firebase.contactuser
 
+import android.app.Activity
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import com.example.applux.domain.models.ContactUser
+import com.example.applux.exceptions.EmailAlreadyExistsWithDifferentCredential
+import com.example.applux.exceptions.EmailAlreadyInUseException
 import com.google.firebase.auth.*
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
@@ -30,7 +34,7 @@ class ContactUserRepositoryImpl @Inject constructor(
         contactCollectionReference.document(auth.currentUser!!.uid)
             .set(contactUser)
             .addOnCompleteListener {
-                Log.e(TAG, "createContactUser: called" )
+                Log.e(TAG, "createContactUser: called")
                 if (it.isSuccessful) {
                     result = true
                 }
@@ -45,7 +49,7 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun findContactUser(
         contacts: HashMap<String, String>
-    ) : Flow<ArrayList<ContactUser>> = flow {
+    ): Flow<ArrayList<ContactUser>> = flow {
         val contactsList = ArrayList<ContactUser>()
         val contactsvalues: ArrayList<String> = ArrayList(contacts.values.toList())
         val chuncked = contactsvalues.chunked(10)
@@ -63,22 +67,37 @@ class ContactUserRepositoryImpl @Inject constructor(
         emit(contactsList)
     }
 
+    override suspend fun findUser(
+        name: String
+    ): Flow<ArrayList<ContactUser>> = flow {
+        val contactsList = ArrayList<ContactUser>()
+
+        val p = contactCollectionReference.where(
+            Filter.or(Filter.greaterThanOrEqualTo("name", name),
+            Filter.lessThanOrEqualTo("name", name))
+        ).get().await()
+        p.documents.forEach {
+            val contact = it.toObject(ContactUser::class.java)
+            if (contact != null && !contact.uid.equals(auth.currentUser!!.uid)) {
+                contactsList.add(contact)
+            }
+        }
+
+        emit(contactsList)
+    }
+
     override fun getContactByUid(uid: String): Flow<ContactUser?> = flow {
-        var contactUser: ContactUser? = null
-        contactCollectionReference
+        val contactUser = contactCollectionReference
             .document(uid)
             .get()
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    contactUser = it.result.toObject(ContactUser::class.java)!!
-                }
-            }
             .await()
+            .toObject(ContactUser::class.java)
+
         emit(contactUser)
     }
 
-    override suspend fun checkIfContactAlreadyExist(phone: String) : Boolean {
-        var result  = false
+    override suspend fun checkIfContactAlreadyExist(phone: String): Boolean {
+        var result = false
         contactCollectionReference.whereIn("phoneOrEmail", arrayListOf(phone))
             .get()
             .addOnSuccessListener {
@@ -115,8 +134,8 @@ class ContactUserRepositoryImpl @Inject constructor(
                     result = false
                 }
                 ?.await()
-        }catch (exc : FirebaseFirestoreException){
-            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND){
+        } catch (exc: FirebaseFirestoreException) {
+            if (exc.code == FirebaseFirestoreException.Code.NOT_FOUND) {
 
             }
         }
@@ -125,7 +144,7 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override fun sendVerificationCode(
         phone: String,
-        require: FragmentActivity,
+        require: Activity,
         callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     ) {
         val options = PhoneAuthOptions.newBuilder(auth)
@@ -160,17 +179,29 @@ class ContactUserRepositoryImpl @Inject constructor(
 
     override suspend fun signInWithFacebookCredential(
         credential: AuthCredential
-    ) : Boolean{
+    ): Boolean {
         var result = false
-        auth.signInWithCredential(credential)
-            .addOnCompleteListener {
-                if (it.isSuccessful){
-                    result = true
+        try {
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        result = true
+                    }
                 }
-            }
-            .addOnFailureListener { result = false }
-            .await()
+                .addOnFailureListener { result = false }
+                .await()
+        } catch (exception: FirebaseAuthUserCollisionException) {
+            if (exception.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") {
+                throw EmailAlreadyInUseException()
+            } else if (exception.errorCode == "ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL") {
+                Log.e(TAG, "signInWithFacebookCredential: ${exception.updatedCredential?.provider}")
+                throw EmailAlreadyExistsWithDifferentCredential(
+                    exception.email,
+                    exception.updatedCredential
+                )
 
+            }
+        }
         return result
     }
 
@@ -178,7 +209,7 @@ class ContactUserRepositoryImpl @Inject constructor(
         var result = false
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     result = true
                 }
             }
@@ -190,11 +221,11 @@ class ContactUserRepositoryImpl @Inject constructor(
         return result
     }
 
-    override suspend fun signInWithTwitterCredential(credential: AuthCredential) : Boolean{
+    override suspend fun signInWithTwitterCredential(credential: AuthCredential): Boolean {
         var result = false
         auth.signInWithCredential(credential)
             .addOnCompleteListener {
-                if (it.isSuccessful){
+                if (it.isSuccessful) {
                     result = true
                 }
             }

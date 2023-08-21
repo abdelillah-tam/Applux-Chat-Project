@@ -6,12 +6,9 @@ import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.flow.Flow
 
 interface MessageRepository {
-    suspend fun sendMessage(message: Message) : Boolean
-
-
-    suspend fun getAllMessages(receiverUid: String, firstTime: Boolean, position: Message?) : Flow<QuerySnapshot?>
+    suspend fun sendMessage(message: Message, receiverUid: String) : Boolean
 
     fun getUsersYouTalkedWith() : Flow<Set<Message>>
 
-    fun listenForNewMessage(receiverUid: String) : Flow<Message?>
+    fun listenForNewMessage(receiverUid: String) : Flow<List<Message>>
 }

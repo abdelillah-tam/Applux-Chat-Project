@@ -9,29 +9,28 @@ import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 private const val TAG = "MessageRepositoryImpl"
 
 class MessageRepositoryImpl @Inject constructor(
-   val contactCollectionReference: CollectionReference
-
+    private val contactCollectionReference: CollectionReference
 ) : MessageRepository {
 
 
     private val auth: FirebaseAuth = Firebase.auth
 
     override suspend fun sendMessage(
-        message: Message
+        message: Message,
+        receiverUid: String
     ): Boolean {
         var isSent = false
         val createSender =
             contactCollectionReference.document(message.senderUID!!).collection("sharedChat")
-                .document(message.receiverUID!!)
+                .document(receiverUid)
         val createReceiver =
-            contactCollectionReference.document(message.receiverUID!!).collection("sharedChat")
+            contactCollectionReference.document(receiverUid).collection("sharedChat")
                 .document(message.senderUID!!)
 
         createSender.set(message)
@@ -63,37 +62,9 @@ class MessageRepositoryImpl @Inject constructor(
         return isSent
     }
 
-    override suspend fun getAllMessages(
-        receiverUid: String,
-        firstTime: Boolean,
-        position: Message?
-    ): Flow<QuerySnapshot?> = flow {
 
-            val messages = contactCollectionReference.document(auth.currentUser!!.uid)
-                .collection("sharedChat").document(receiverUid).collection("messages")
-
-            var gotMsgs: QuerySnapshot?
-            if (firstTime) {
-                gotMsgs =
-                    messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
-                        .get().await()
-
-            } else {
-                gotMsgs =
-                    messages.limit(30).orderBy("timestamp", Query.Direction.DESCENDING)
-                        .startAfter(position?.timestamp)
-                        .get().await()
-            }
-            if (gotMsgs != null && gotMsgs.size() != 0) {
-                Log.e(TAG, "getAllMessages: inside if statement called" )
-                emit(gotMsgs)
-            }else{
-                emit(null)
-            }
-
-    }
     override fun getUsersYouTalkedWith(): Flow<Set<Message>> = callbackFlow {
-        var finalContactWithLastMessage = emptySet<Message>()
+        var finalContactWithLastMessage = mutableSetOf<Message>()
         val streamingUsers = contactCollectionReference.document(auth.currentUser!!.uid)
             .collection("sharedChat").orderBy("timestamp", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
@@ -106,8 +77,8 @@ class MessageRepositoryImpl @Inject constructor(
                     }
                     try {
                         trySend(finalContactWithLastMessage)
-                        finalContactWithLastMessage = emptySet()
-                    } catch (e: Throwable) {
+                        finalContactWithLastMessage = mutableSetOf()
+                    } catch (_: Throwable) {
                     }
                 }
             }
@@ -115,7 +86,7 @@ class MessageRepositoryImpl @Inject constructor(
         awaitClose { streamingUsers.remove() }
     }
 
-    override fun listenForNewMessage(receiverUid: String) : Flow<Message?> = callbackFlow {
+    override fun listenForNewMessage(receiverUid: String) : Flow<List<Message>> = callbackFlow {
         val message = contactCollectionReference.document(auth.currentUser!!.uid)
             .collection("sharedChat").document(receiverUid)
             .collection("messages")
@@ -125,10 +96,12 @@ class MessageRepositoryImpl @Inject constructor(
                     return@addSnapshotListener
                 }
                 if (value != null){
-                    val message = value.documents[0].toObject(Message::class.java)
+                    val messages = value.documentChanges.map {
+                        it.document.toObject(Message::class.java)
+                    }
                     try {
-                        trySend(message)
-                    }catch (e: Throwable){
+                        trySend(messages)
+                    }catch (_: Throwable){
 
                     }
                 }

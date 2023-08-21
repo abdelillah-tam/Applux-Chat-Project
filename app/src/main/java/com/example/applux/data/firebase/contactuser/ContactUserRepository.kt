@@ -1,6 +1,6 @@
 package com.example.applux.data.firebase.contactuser
 
-import androidx.fragment.app.FragmentActivity
+import android.app.Activity
 import com.example.applux.domain.models.ContactUser
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.PhoneAuthCredential
@@ -21,11 +21,13 @@ interface ContactUserRepository {
 
     suspend fun updateUsername(username: String): Boolean
 
-    fun sendVerificationCode(phone: String, require: FragmentActivity, callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks)
+    fun sendVerificationCode(phone: String, require: Activity, callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks)
 
     suspend fun signInWithPhoneCredential(
         credential: PhoneAuthCredential
     ) : Boolean
+
+    suspend fun findUser(name: String) : Flow<ArrayList<ContactUser>>
 
     suspend fun signInWithFacebookCredential(
         credential: AuthCredential

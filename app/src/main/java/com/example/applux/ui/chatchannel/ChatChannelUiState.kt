@@ -8,7 +8,7 @@ import com.example.applux.domain.models.Message
 import com.google.firebase.firestore.DocumentSnapshot
 
 data class ChatChannelUiState(
-    val profilePictureBitmap: Bitmap? = null,
+    val profilePicture: String? = null,
     val contactUser: ContactUser? = null,
     val messages : HashMap<String, MessageUiState> = HashMap(),
     val about: About? = null,

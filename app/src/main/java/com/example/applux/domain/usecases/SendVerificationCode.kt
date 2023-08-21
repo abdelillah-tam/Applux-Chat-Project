@@ -1,5 +1,6 @@
 package com.example.applux.domain.usecases
 
+import android.app.Activity
 import androidx.fragment.app.FragmentActivity
 import com.example.applux.data.firebase.contactuser.ContactUserRepository
 import com.google.firebase.auth.PhoneAuthProvider
@@ -12,7 +13,7 @@ class SendVerificationCode @Inject constructor(
 
     operator fun invoke(
         phone: String,
-        require: FragmentActivity,
+        require: Activity,
         callback: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     ) {
         contactUserRepository.sendVerificationCode(

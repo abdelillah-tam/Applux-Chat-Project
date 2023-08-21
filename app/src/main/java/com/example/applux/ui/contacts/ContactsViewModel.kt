@@ -1,9 +1,8 @@
 package com.example.applux.ui.contacts
 
-import android.graphics.BitmapFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.applux.domain.usecases.DownloadProfilePicture
+import com.example.applux.data.firebase.contactuser.ContactUserRepository
 import com.example.applux.domain.usecases.FindContactUser
 import com.example.applux.domain.usecases.GetProfilePicture
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,27 +15,31 @@ import javax.inject.Inject
 @HiltViewModel
 class ContactsViewModel @Inject constructor(
     private val findContactUser: FindContactUser,
-    private val getProfilePicture: GetProfilePicture
+    private val getProfilePicture: GetProfilePicture,
+    private val contactRepository: ContactUserRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ContactsUiState())
-    val state = _state.asStateFlow()
+    private val _onlineContactState = MutableStateFlow(ContactsUiState())
+    val onlineContactState = _onlineContactState.asStateFlow()
+
+    private val _localContactState = MutableStateFlow(ContactsUiState())
+    val localContactState = _localContactState.asStateFlow()
 
 
     fun getContactsViewModel(contacts: HashMap<String, String>) {
         viewModelScope.launch {
-            findContactUser(contacts).collect {
+            findContactUser(contacts).collect { contactArray ->
                 val list = ArrayList<ContactsItemUiState>()
                 var position : Int
-                it.forEach {
+                contactArray.forEach {
                     val item = ContactsItemUiState(contactUser = it)
-                    list.also {
-                        it.add(item)
-                        position = it.indexOf(item)
+                    list.also { listItem ->
+                        listItem.add(item)
+                        position = listItem.indexOf(item)
                     }
-                    getProfilePictureViewModel(it.uid!!, position)
+                    getLocalProfilePictureViewModel(it.uid!!, position)
                 }
-                _state.update {
+                _localContactState.update {
                     it.copy(contactsItemUiState = list)
                 }
             }
@@ -44,19 +47,40 @@ class ContactsViewModel @Inject constructor(
 
     }
 
-    private fun getProfilePictureViewModel(uid: String, positionInList: Int) {
+    private fun getOnlineProfilePictureViewModel(uid: String, positionInList: Int) {
         viewModelScope.launch {
             getProfilePicture(uid).collect { profilePicture ->
                 if (profilePicture != null){
-                    _state.update {
+                    _onlineContactState.update {
                         val list = ArrayList<ContactsItemUiState>()
                         list.addAll(it.contactsItemUiState)
                         val item = ContactsItemUiState(
                             picture = profilePicture,
-                            contactUser = list.get(positionInList).contactUser,
-                            profileBitmap = list.get(positionInList).profileBitmap
+                            contactUser = list[positionInList].contactUser,
+                            profileBitmap = list[positionInList].profileBitmap
                         )
-                        list.set(positionInList, item)
+                        list[positionInList] = item
+                        it.copy(contactsItemUiState = list)
+                    }
+                }
+            }
+
+        }
+    }
+
+    private fun getLocalProfilePictureViewModel(uid: String, positionInList: Int) {
+        viewModelScope.launch {
+            getProfilePicture(uid).collect { profilePicture ->
+                if (profilePicture != null){
+                    _localContactState.update {
+                        val list = ArrayList<ContactsItemUiState>()
+                        list.addAll(it.contactsItemUiState)
+                        val item = ContactsItemUiState(
+                            picture = profilePicture,
+                            contactUser = list[positionInList].contactUser,
+                            profileBitmap = list[positionInList].profileBitmap
+                        )
+                        list[positionInList] = item
                         it.copy(contactsItemUiState = list)
                     }
                 }
@@ -66,7 +90,25 @@ class ContactsViewModel @Inject constructor(
     }
 
 
-
+    fun findUser(name: String){
+        viewModelScope.launch {
+            contactRepository.findUser(name).collect{ contactArray ->
+                val list = ArrayList<ContactsItemUiState>()
+                var position : Int
+                contactArray.forEach {
+                    val item = ContactsItemUiState(contactUser = it)
+                    list.also { listItem ->
+                        listItem.add(item)
+                        position = listItem.indexOf(item)
+                    }
+                    getOnlineProfilePictureViewModel(it.uid!!, position)
+                }
+                _onlineContactState.update {
+                    ContactsUiState(list)
+                }
+            }
+        }
+    }
 
    /* downloadProfilePicture(
     uid,

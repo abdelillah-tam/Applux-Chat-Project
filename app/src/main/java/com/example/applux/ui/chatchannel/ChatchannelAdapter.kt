@@ -1,24 +1,15 @@
 package com.example.applux.ui.chatchannel
 
-import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.example.applux.R
 import com.example.applux.data.TimeByZoneClient
 import com.example.applux.data.WorldTimeModel
-import com.example.applux.domain.models.Message
 import com.example.applux.domain.models.MessageType
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.textview.MaterialTextView
 import com.google.firebase.auth.FirebaseAuth
-import dagger.hilt.android.scopes.FragmentScoped
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
-import org.joda.time.LocalDate
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -28,7 +19,6 @@ import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-@FragmentScoped
 class ChatchannelAdapter @Inject constructor() :
     RecyclerView.Adapter<ChatchannelAdapter.MessageViewHolder>() {
     @Inject
@@ -62,21 +52,19 @@ class ChatchannelAdapter @Inject constructor() :
     }
 
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val date = itemView.findViewById(R.id.date) as MaterialTextView
+       /* val date = itemView.findViewById(R.id.date) as MaterialTextView
         val msgImage = itemView.findViewById(R.id.message_image) as ShapeableImageView
         val msgText = itemView.findViewById(R.id.message_text) as MaterialTextView
-        val msgDate = itemView.findViewById(R.id.msg_date) as MaterialTextView
+        val msgDate = itemView.findViewById(R.id.msg_date) as MaterialTextView*/
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
         if (viewType == SENDER) {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.sender_item, parent, false)
-            return MessageViewHolder(view)
+            //val view = LayoutInflater.from(parent.context).inflate(R.layout.sender_item, parent, false)
+            return MessageViewHolder(parent.rootView)
         } else {
-            val view =
-                LayoutInflater.from(parent.context).inflate(R.layout.receiver_item, parent, false)
-            return MessageViewHolder(view)
+            //val view = LayoutInflater.from(parent.context).inflate(R.layout.receiver_item, parent, false)
+            return MessageViewHolder(parent.rootView)
         }
     }
 
@@ -86,23 +74,23 @@ class ChatchannelAdapter @Inject constructor() :
         val result = calculateDate(messageUiState.message.timestamp!!.toLong())
 
         if (lastDateValue.equals(result)) {
-            holder.date.visibility = MaterialTextView.GONE
+//            holder.date.visibility = MaterialTextView.GONE
         } else {
-            holder.date.text = result
-            holder.date.visibility = MaterialTextView.VISIBLE
+            //holder.date.text = result
+            //holder.date.visibility = MaterialTextView.VISIBLE
             lastDateValue = result
         }
 
         if (messageUiState.message.messageType!!.equals(MessageType.IMAGE) && messageUiState.bitmap != null){
-            holder.msgImage.setImageBitmap(messageUiState.bitmap)
-            holder.msgImage.visibility = ShapeableImageView.VISIBLE
+            //holder.msgImage.setImageBitmap(messageUiState.bitmap)
+            //holder.msgImage.visibility = ShapeableImageView.VISIBLE
         }else{
-            holder.msgImage.visibility = ShapeableImageView.GONE
+//            holder.msgImage.visibility = ShapeableImageView.GONE
         }
 
-        holder.msgText.text = messageUiState.message.text
+//        holder.msgText.text = messageUiState.message.text
         val dateString = timestampToHoursAndMinutes(messageUiState.message.timestamp!!)
-        holder.msgDate.text = dateString
+//        holder.msgDate.text = dateString
 
     }
 

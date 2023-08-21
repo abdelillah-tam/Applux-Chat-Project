@@ -12,9 +12,9 @@ class ListenForNewMessage @Inject constructor(
 ) {
 
 
-    operator fun invoke(receiverUid: String) : Flow<Message> = flow {
+    operator fun invoke(receiverUid: String) : Flow<List<Message>> = flow {
         messageRepository.listenForNewMessage(receiverUid).collect {
-            emit(it!!)
+            emit(it)
         }
     }
 

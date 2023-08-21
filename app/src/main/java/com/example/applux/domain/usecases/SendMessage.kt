@@ -12,8 +12,8 @@ class SendMessage @Inject constructor(
 ){
 
 
-    operator fun invoke(message: Message) : Flow<Boolean> = flow{
-        val isSent = messageRepository.sendMessage(message)
+    operator fun invoke(message: Message, receiverUid: String) : Flow<Boolean> = flow{
+        val isSent = messageRepository.sendMessage(message, receiverUid)
         emit(isSent)
     }
 
